@@ -171,8 +171,6 @@ void setup() {
 }
 
 // ==================== MAIN LOOP ====================
-
-// Main loop qui permet de vérifier le pourcentage de la batterie
 /**
  * Main program loop - runs continuously
  * Handles:
