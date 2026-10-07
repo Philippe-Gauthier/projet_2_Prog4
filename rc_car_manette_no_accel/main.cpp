@@ -1,188 +1,301 @@
 /*
-  ESP32 RC Car with IMU Tilt Detection
-  Features:
-    - MCPWM motor control (2 DC motors)
-    - ESP-NOW wireless communication
-    - BMI323 IMU with tilt detection on INT1 interrupt
-    - NeoPixel RGB LED indicators
-    - Battery monitoring and voltage display
-    - Motor safety cutoff when device is tilted
+  Ce programme :
+  - Initialise la voiture RC
+  - Initialise ESP-NOW
+  - Reçoit les commandes de la manette
+  - Contrôle les NeoPixel
+  - Vérifie la batterie
+  - Prépare la détection d'inclinaison avec l'IMU
 
-  Based upon Espressif ESP32CAM Examples
-  LP Gauthier 2025
+  Auteur original : LP Gauthier - 2025
 */
 
-// ==================== INCLUDE FILES ====================
 
-// -------- Arduino/ESP32 Standard Libraries --------
-#include "Arduino.h"              // Core Arduino functions and types
-#include "soc/soc.h"              // ESP32 System-on-Chip low-level definitions
-#include "soc/rtc_cntl_reg.h"     // ESP32 RTC control register definitions
+// ==================== BIBLIOTHÈQUES ====================
 
-// -------- ESP32 Wireless & Communication --------
-#include <esp_now.h>              // ESP-NOW wireless protocol for remote control
-#include <WiFi.h>                 // WiFi library (required by esp_now)
-#include <Wire.h>                 // I2C communication protocol
+#include "Arduino.h"              // Fonctions Arduino
+#include "soc/soc.h"              // Fonctions internes ESP32
+#include "soc/rtc_cntl_reg.h"     // Gestion de l'alimentation ESP32
 
-// -------- Third-Party Libraries --------
-#include <ArduinoJson.h>          // JSON parsing for remote control messages
-#include "Adafruit_NeoPixel.h"    // RGB LED strip control library
+#include <esp_now.h>              // Communication ESP-NOW
+#include <WiFi.h>                 // WiFi ESP32
+#include <Wire.h>                 // Communication I2C
 
-// -------- Custom Libraries & Configuration --------
-#include "user_define.h"          // Configuration constants and pin definitions
-#include "rc_car.h"               // RC car helper functions (motor, battery, comms)
+#include <ArduinoJson.h>          // Lecture des messages JSON
+#include "Adafruit_NeoPixel.h"    // Contrôle des NeoPixel
 
-// ==================== GLOBAL STATE VARIABLES ====================
+#include "user_define.h"          // Constantes et broches du projet
+#include "rc_car.h"               // Fonctions de la voiture
 
-// LED state management
+
+// ==================== VARIABLES GLOBALES ====================
+
+// État des lumières
 bool LED_STATE = false;
-bool IMU_ERROR = true; // Assume IMU error until successfully initialized
 
-// SELECT button state tracking (for button press detection)
+// État de l'IMU
+bool IMU_ERROR = true;
+
+// État précédent du bouton SELECT
 bool previousSeState = true;
+
+// État actuel du bouton SELECT
 bool currentSeState = true;
 
-// Tilt detection state for motor safety
+// Indique si la voiture est trop inclinée
 bool tiltDetected = false;
 
-// Time constants for sensor reading intervals
+
+// Dernière lecture de l'IMU
 static unsigned long lastIMUReading = 0;
-static unsigned long IMUInterval = 50; // 50ms
 
+// Lecture IMU toutes les 50 ms
+static unsigned long IMUInterval = 50;
+
+
+// Dernière vérification de batterie
 static unsigned long lastBatteryCheck = 0;
-static unsigned long BatteryCheckInterval = 30000; // 30 seconds
+
+// Vérification batterie toutes les 30 secondes
+static unsigned long BatteryCheckInterval = 30000;
 
 
-// ==================== PERIPHERAL OBJECTS ====================
+// ==================== NEOPIXEL ====================
 
-// NeoPixel RGB LED strips
-Adafruit_NeoPixel pixelsBattery(NEOPIXEL_BATTERY_NUMBER, NEOPIXEL_BATTERY_PIN, NEO_GRB + NEO_KHZ800); // Battery status indicator
+// NeoPixel utilisé pour afficher l'état de la batterie
+Adafruit_NeoPixel pixelsBattery(
+  NEOPIXEL_BATTERY_NUMBER,
+  NEOPIXEL_BATTERY_PIN,
+  NEO_GRB + NEO_KHZ800
+);
 
-// ==================== DATA STRUCTURES ====================
 
-// JSON message structure for ESP-NOW protocol
+// ==================== MESSAGE ESP-NOW ====================
+
+// Structure utilisée pour recevoir les commandes
 typedef struct struct_message {
-  char command[256]; // JSON command buffer containing button/joystick data
+
+  // Contient le message JSON reçu
+  char command[256];
+
 } struct_message;
 
+
+// Message reçu
 struct_message incomingMessage;
 
-// ==================== REMOTE DEVICE CONFIGURATION ====================
 
-// MAC address of the remote controller (phone/gamepad)
-// Format: {0xXX, 0xXX, 0xXX, 0xXX, 0xXX, 0xXX}
-uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC};
+// ==================== MANETTE ====================
+
+// Adresse MAC de la manette
+uint8_t peerAddress[] = {
+  0xDC,
+  0x54,
+  0x75,
+  0xC0,
+  0x83,
+  0xCC
+};
+
 
 // ==================== SETUP ====================
 
-/**
- * Initialization function - runs once at startup
- * Configures:
- *   - Motor PWM control
- *   - Serial communication
- *   - WiFi and ESP-NOW protocol
- *   - Remote peer device
- */
+/*
+  setup()
+  Initialise les moteurs, les NeoPixel,
+  le WiFi et ESP-NOW.
+*/
 void setup() {
-  // Disable brownout detector to prevent unexpected resets under high current draw
+
+  // Désactive la protection contre les baisses de tension
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
-  
-  // Initialize motor control PWM
+
+  // Initialise les moteurs
   rcCar_setup();
 
-  // Initialize NeoPixel battery indicator
+
+  // Initialise les NeoPixel
   pixelsBattery.begin();
+
+  // Règle la luminosité
   pixelsBattery.setBrightness(NEOPIXEL_BRIGHTNESS);
-  pixelsBattery.fill(0x0000FF); // Fill blue to indicate startup
+
+  // Met les NeoPixel en bleu
+  pixelsBattery.fill(0x0000FF);
+
+  // Affiche la couleur
   pixelsBattery.show();
 
-  // Initialize serial communication (115200 baud)
+
+  // Initialise le port série
   Serial.begin(115200);
+
+
+  // Vérifie si le mode DEBUG est activé
   if (DEBUG) {
+
+    // Active les messages de debug
     Serial.setDebugOutput(true);
-    //while(!Serial); // Wait for serial port to connect (for native USB devices)
+
+    // Attend 3 secondes
     delay(3000);
+
   } else {
+
+    // Désactive les messages de debug
     Serial.setDebugOutput(false);
   }
-        
-  // ==================== ESP-NOW INITIALIZATION ====================
-  
-  // Initialize WiFi in station mode for ESP-NOW
+
+
+  // ==================== ESP-NOW ====================
+
+  // Met le WiFi en mode station
   WiFi.mode(WIFI_STA);
+
+  // Affiche l'adresse MAC de l'ESP32
   Serial.print("ESP32 MAC Address: ");
+
+  // Affiche l'adresse MAC
   Serial.println(WiFi.macAddress());
-  
-  // Initialize ESP-NOW protocol
+
+
+  // Initialise ESP-NOW
   if (esp_now_init() != ESP_OK) {
+
+    // Affiche une erreur
     Serial.println("Error initializing ESP-NOW");
-    pixelsBattery.fill(0x0000FF); // Blue color indicates ESP-NOW error
+
+    // Met le NeoPixel en bleu
+    pixelsBattery.fill(0x0000FF);
+
+    // Affiche la couleur
     pixelsBattery.show();
+
+    // Attend 2 secondes
     delay(2000);
-    ESP.restart(); // Restart device if ESP-NOW fails
+
+    // Redémarre l'ESP32
+    ESP.restart();
+
+    // Quitte setup()
     return;
   }
-  
-  // Register callback function for incoming ESP-NOW messages
+
+
+  // Appelle onDataRecv() quand un message est reçu
   esp_now_register_recv_cb(onDataRecv);
 
-  // ==================== REGISTER REMOTE PEER ====================
-  
-  // Configure peer (remote controller) information
-  esp_now_peer_info_t peerInfo = {};
-  memcpy(peerInfo.peer_addr, peerAddress, 6);
-  peerInfo.channel = 0;  
-  peerInfo.encrypt = false;
-  peerInfo.ifidx = WIFI_IF_STA; // Use station mode interface
 
-  // Display peer MAC address
+  // ==================== AJOUT DE LA MANETTE ====================
+
+  // Crée les informations de la manette
+  esp_now_peer_info_t peerInfo = {};
+
+  // Copie l'adresse MAC de la manette
+  memcpy(peerInfo.peer_addr, peerAddress, 6);
+
+  // Utilise le canal actuel
+  peerInfo.channel = 0;
+
+  // Désactive le chiffrement
+  peerInfo.encrypt = false;
+
+  // Utilise le mode WiFi station
+  peerInfo.ifidx = WIFI_IF_STA;
+
+
+  // Affiche l'adresse MAC de la manette
   Serial.print("Adding peer with MAC: ");
+
+
+  // Parcourt les 6 parties de l'adresse MAC
   for (int i = 0; i < 6; i++) {
-      Serial.printf("%02X", peerAddress[i]);
-      if (i < 5) Serial.print(":");
+
+    // Affiche une partie de l'adresse MAC
+    Serial.printf("%02X", peerAddress[i]);
+
+    // Ajoute ":" entre les parties
+    if (i < 5)
+      Serial.print(":");
   }
+
+
+  // Passe à la ligne suivante
   Serial.println();
 
-  // Add peer if it doesn't exist
+
+  // Vérifie si la manette est déjà ajoutée
   if (!esp_now_is_peer_exist(peerAddress)) {
-      if (esp_now_add_peer(&peerInfo) != ESP_OK) {
-          Serial.println("Failed to add peer");
-          pixelsBattery.fill(0x0000FF); // Blue indicates peer registration error
-          pixelsBattery.show();
-          delay(2000);
-          ESP.restart();
-          return;
-      }
+
+    // Essaie d'ajouter la manette
+    if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+
+      // Affiche une erreur
+      Serial.println("Failed to add peer");
+
+      // Met le NeoPixel en bleu
+      pixelsBattery.fill(0x0000FF);
+
+      // Affiche la couleur
+      pixelsBattery.show();
+
+      // Attend 2 secondes
+      delay(2000);
+
+      // Redémarre l'ESP32
+      ESP.restart();
+
+      // Quitte setup()
+      return;
+    }
+
   } else {
-      Serial.println("Peer already exists");
+
+    // Indique que la manette existe déjà
+    Serial.println("Peer already exists");
   }
 
-  // ==================== STARTUP INDICATION ====================
-  // Perform initial battery check
+
+  // ==================== FIN DU DÉMARRAGE ====================
+
+  // Affiche un message
   Serial.println("Performing initial battery check...");
+
+  // Vérifie la batterie
   getBatteryPercentage();
 
+
+  // Indique que l'initialisation est terminée
   Serial.println("Setup complete, entering main loop...");
-  // Blink LED 3 times to indicate successful setup
+
+
+  // Fait clignoter les lumières 3 fois
   for (int i = 0; i < 6; i++) {
+
+    // Change l'état des lumières
     toggleLights();
+
+    // Attend 100 ms
     delay(100);
   }
 }
 
-// ==================== MAIN LOOP ====================
 
-// Main loop qui permet de vérifier le pourcentage de la batterie
-/**
- * Main program loop - runs continuously
- * Handles:
- *   - ESP-NOW message processing
- *   - Battery voltage monitoring (every 30 seconds)
- */
+// ==================== LOOP ====================
+
+/*
+  loop()
+  Vérifie la batterie toutes les 30 secondes.
+*/
 void loop() {
-  // Check battery voltage every 30 seconds
+
+  // Vérifie si 30 secondes sont passées
   if (millis() - lastBatteryCheck > BatteryCheckInterval) {
+
+    // Sauvegarde le temps actuel
     lastBatteryCheck = millis();
+
+    // Vérifie la batterie
     getBatteryPercentage();
   }
 }
