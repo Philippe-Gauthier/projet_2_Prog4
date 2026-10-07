@@ -1,24 +1,22 @@
 /*
   Voiture RC avec ESP32
-  - Contrôle de 2 moteurs
-  - Communication ESP-NOW
-  - Détection d'inclinaison avec IMU
-  - NeoPixel pour la batterie
-  - Surveillance de la batterie
+  Le programme initialise la voiture, la communication ESP-NOW,
+  le NeoPixel et la surveillance de la batterie.
 */
+
 
 // ==================== BIBLIOTHÈQUES ====================
 
 #include "Arduino.h"              // Fonctions de base Arduino
-#include "soc/soc.h"              // Fonctions bas niveau du ESP32
-#include "soc/rtc_cntl_reg.h"     // Registres de contrôle du ESP32
+#include "soc/soc.h"              // Fonctions internes du ESP32
+#include "soc/rtc_cntl_reg.h"     // Contrôle de certains registres du ESP32
 
 #include <esp_now.h>              // Communication sans fil ESP-NOW
 #include <WiFi.h>                 // Wi-Fi nécessaire pour ESP-NOW
 #include <Wire.h>                 // Communication I2C
 
-#include <ArduinoJson.h>          // Lecture des commandes au format JSON
-#include "Adafruit_NeoPixel.h"    // Contrôle de la DEL NeoPixel
+#include <ArduinoJson.h>          // Permet de traiter les messages JSON
+#include "Adafruit_NeoPixel.h"    // Contrôle du NeoPixel
 
 #include "user_define.h"          // Broches et constantes du projet
 #include "rc_car.h"               // Fonctions de contrôle de la voiture
@@ -26,138 +24,137 @@
 
 // ==================== VARIABLES GLOBALES ====================
 
-// État des lumières et de l'IMU
-bool LED_STATE = false;           // false = phares éteints
-bool IMU_ERROR = true;            // true = erreur IMU au départ
+// État des phares et de l'IMU
+bool LED_STATE = false;
+bool IMU_ERROR = true;
 
-// État précédent et actuel du bouton SELECT
+// Permet de détecter un changement d'état du bouton SELECT
 bool previousSeState = true;
 bool currentSeState = true;
 
-// Sécurité d'inclinaison
-bool tiltDetected = false;        // true = inclinaison détectée
+// Indique si une inclinaison a été détectée
+bool tiltDetected = false;
 
-// Temps pour les lectures de l'IMU
-static unsigned long lastIMUReading = 0;  // Temps de la dernière lecture
-static unsigned long IMUInterval = 50;    // Intervalle de 50 ms
+// Variables de temps pour l'IMU
+static unsigned long lastIMUReading = 0;
+static unsigned long IMUInterval = 50; // 50 ms
 
-// Temps pour la vérification de la batterie
-static unsigned long lastBatteryCheck = 0;             // Dernière vérification
-static unsigned long BatteryCheckInterval = 30000;     // 30 secondes
+// Variables de temps pour vérifier la batterie
+static unsigned long lastBatteryCheck = 0;
+static unsigned long BatteryCheckInterval = 30000; // 30 secondes
+
 
 // ==================== NEOPIXEL ====================
 
-// Création du NeoPixel utilisé pour afficher l'état de la batterie
+// NeoPixel utilisé comme indicateur de batterie
 Adafruit_NeoPixel pixelsBattery(NEOPIXEL_BATTERY_NUMBER, NEOPIXEL_BATTERY_PIN, NEO_GRB + NEO_KHZ800);
 
-// ==================== STRUCTURE DES DONNÉES ====================
 
-// Structure contenant la commande JSON reçue par ESP-NOW
+// ==================== STRUCTURE DU MESSAGE ====================
+
+// Structure qui contient la commande JSON reçue par ESP-NOW
 typedef struct struct_message {
-  char command[256];              // Tableau qui contient la commande reçue
+  char command[256];
 } struct_message;
 
-struct_message incomingMessage;   // Variable qui recevra le message
+struct_message incomingMessage;
 
-// ==================== APPAREIL DISTANT ====================
 
-// Adresse MAC de la télécommande
+// ==================== TÉLÉCOMMANDE ====================
+
+// Adresse MAC de l'appareil avec lequel le ESP32 communique
 uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC};
+
 
 // ==================== SETUP ====================
 
 // setup() est exécuté une seule fois au démarrage
 void setup() {
 
-  // Désactive la protection brownout pour éviter certains redémarrages
+  // Désactive la protection brownout
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
   
-  // Initialise le contrôle des moteurs
+  // Initialise les moteurs et les éléments de la voiture
   rcCar_setup();
 
 
-  // Initialise le NeoPixel de la batterie
+  // Initialise le NeoPixel
   pixelsBattery.begin();
-  pixelsBattery.setBrightness(NEOPIXEL_BRIGHTNESS);  // Règle la luminosité
-  pixelsBattery.fill(0x0000FF);                      // Bleu au démarrage
-  pixelsBattery.show();                              // Affiche la couleur
+  pixelsBattery.setBrightness(NEOPIXEL_BRIGHTNESS);
+  pixelsBattery.fill(0x0000FF); // Bleu au démarrage
+  pixelsBattery.show();
 
 
-  // Démarre la communication série à 115200 bauds
+  // Démarre la communication série
   Serial.begin(115200);
 
   if (DEBUG) {
-    Serial.setDebugOutput(true);     // Active les messages de debug
-    //while(!Serial); // Attendrait la connexion du port série
-    delay(3000);                     // Attend 3 secondes
+    Serial.setDebugOutput(true);
+    //while(!Serial);
+    delay(3000);
   } else {
-    Serial.setDebugOutput(false);    // Désactive les messages de debug
+    Serial.setDebugOutput(false);
   }
         
 
-  // ==================== INITIALISATION ESP-NOW ====================
+  // ==================== ESP-NOW ====================
   
-  // Place le Wi-Fi en mode Station pour utiliser ESP-NOW
+  // Place le Wi-Fi en mode station
   WiFi.mode(WIFI_STA);
 
+  // Affiche l'adresse MAC du ESP32
   Serial.print("ESP32 MAC Address: ");
-  Serial.println(WiFi.macAddress());  // Affiche l'adresse MAC du ESP32
+  Serial.println(WiFi.macAddress());
   
 
   // Initialise ESP-NOW
   if (esp_now_init() != ESP_OK) {
-
-    // Si l'initialisation échoue
     Serial.println("Error initializing ESP-NOW");
 
     pixelsBattery.fill(0x0000FF);
     pixelsBattery.show();
 
     delay(2000);
-    ESP.restart();                    // Redémarre le ESP32
-    return;                           // Quitte setup()
+
+    // Redémarre le ESP32 si ESP-NOW ne fonctionne pas
+    ESP.restart();
+    return;
   }
   
 
-  // Appelle onDataRecv() automatiquement lorsqu'un message est reçu
+  // onDataRecv() sera appelée lorsqu'un message ESP-NOW est reçu
   esp_now_register_recv_cb(onDataRecv);
 
 
-  // ==================== CONFIGURATION DE LA TÉLÉCOMMANDE ====================
+  // ==================== APPAREIL DISTANT ====================
   
-  // Crée la configuration de l'appareil distant
+  // Crée les informations de l'appareil distant
   esp_now_peer_info_t peerInfo = {};
 
-  // Copie l'adresse MAC dans la configuration
+  // Copie son adresse MAC
   memcpy(peerInfo.peer_addr, peerAddress, 6);
 
-  peerInfo.channel = 0;               // Canal de communication
-  peerInfo.encrypt = false;           // Communication non chiffrée
-  peerInfo.ifidx = WIFI_IF_STA;       // Utilise le mode Station
+  peerInfo.channel = 0;  
+  peerInfo.encrypt = false;
+  peerInfo.ifidx = WIFI_IF_STA;
 
 
-  // Affiche l'adresse MAC de la télécommande
+  // Affiche son adresse MAC dans le moniteur série
   Serial.print("Adding peer with MAC: ");
 
   for (int i = 0; i < 6; i++) {
-
-      // Affiche chaque partie de l'adresse MAC en hexadécimal
       Serial.printf("%02X", peerAddress[i]);
 
-      // Ajoute ":" entre les parties de l'adresse
       if (i < 5) Serial.print(":");
   }
 
   Serial.println();
 
 
-  // Vérifie si la télécommande est déjà enregistrée
+  // Ajoute l'appareil s'il n'est pas déjà enregistré
   if (!esp_now_is_peer_exist(peerAddress)) {
 
-      // Ajoute la télécommande à ESP-NOW
       if (esp_now_add_peer(&peerInfo) != ESP_OK) {
-
-          // Si l'ajout échoue
           Serial.println("Failed to add peer");
 
           pixelsBattery.fill(0x0000FF);
@@ -169,14 +166,13 @@ void setup() {
       }
 
   } else {
-
-      // La télécommande était déjà enregistrée
       Serial.println("Peer already exists");
   }
 
-  // ==================== FIN DU DÉMARRAGE ===================
 
-  // Effectue une première vérification de la batterie
+  // ==================== FIN DU DÉMARRAGE ====================
+
+  // Vérifie une première fois le niveau de la batterie
   Serial.println("Performing initial battery check...");
   getBatteryPercentage();
 
@@ -184,25 +180,26 @@ void setup() {
   Serial.println("Setup complete, entering main loop...");
 
 
-  // Change l'état des phares 6 fois = 3 clignotements
+  // Change l'état des phares 6 fois, ce qui donne 3 clignotements
   for (int i = 0; i < 6; i++) {
     toggleLights();
-    delay(100);                       // 100 ms entre chaque changement
+    delay(100);
   }
 }
 
+
 // ==================== BOUCLE PRINCIPALE ====================
 
-// loop() est répétée continuellement
+// loop() fonctionne continuellement après le setup
 void loop() {
 
-  // Vérifie si 30 secondes se sont écoulées
+  // Vérifie la batterie toutes les 30 secondes
   if (millis() - lastBatteryCheck > BatteryCheckInterval) {
 
-    // Enregistre le moment de la vérification
+    // Mémorise le moment de la dernière vérification
     lastBatteryCheck = millis();
 
-    // Vérifie le niveau de la batterie
+    // Lit le niveau de la batterie
     getBatteryPercentage();
   }
 }

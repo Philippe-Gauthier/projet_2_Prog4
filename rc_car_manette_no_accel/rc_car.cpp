@@ -1,21 +1,21 @@
 #include "rc_car.h"
 #include "Arduino.h"
-#include "driver/mcpwm.h"
-#include "Adafruit_NeoPixel.h"
-#include <ArduinoJson.h>
-#include <Wire.h>
-#include "user_define.h"
+#include "driver/mcpwm.h"         // Contrôle PWM des moteurs
+#include "Adafruit_NeoPixel.h"   // Contrôle du NeoPixel
+#include <ArduinoJson.h>          // Lecture des messages JSON
+#include <Wire.h>                 // Communication I2C
+#include "user_define.h"          // Broches et constantes du projet
 
 
-// ==================== CONFIGURATION DES LUMIÈRES ====================
+// ==================== PHARES ====================
 
-// Canal PWM utilisé pour contrôler la puissance des phares
+// Canal PWM utilisé pour contrôler les phares
 const int lights_pwm_channel = 0;
 
 
-// ==================== VARIABLES GLOBALES EXTERNES ====================
+// ==================== VARIABLES EXTERNES ====================
 
-// Ces variables sont créées dans main.cpp et utilisées ici
+// Variables créées dans le main.cpp et utilisées dans ce fichier
 extern bool LED_STATE;
 extern bool previousSeState;
 extern bool currentSeState;
@@ -23,44 +23,42 @@ extern bool tiltDetected;
 extern Adafruit_NeoPixel pixelsBattery;
 
 
-// Structure utilisée pour recevoir la commande JSON par ESP-NOW
+// Structure du message reçu par ESP-NOW
 typedef struct struct_message {
   char command[256];
 } struct_message;
 
 extern struct_message incomingMessage;
 
-// Lights power percentage (used for PWM mapping)
-int lights_power = HIGH_BEAM_POWER; // default to high beam percentage (0-100)
 
-/**
- * Convert a 0-100 percentage into 8-bit PWM value (0-255)
- * @param percent Input percentage (0-100)
- * @return PWM value (0-255)
- */
+// Puissance des phares, haute puissance par défaut
+int lights_power = HIGH_BEAM_POWER;
+
+
+// Convertit un pourcentage de 0-100 en valeur PWM de 0-255
 static uint8_t percentToPWM(int percent) {
   percent = constrain(percent, 0, 100);
   return (uint8_t)map(percent, 0, 100, 0, 255);
 }
 
 
-// ==================== CONTRÔLE DES MOTEURS ====================
+// ==================== INITIALISATION ====================
 
-// Initialise les moteurs, leur PWM, les phares et le NeoPixel
 void rcCar_setup()
 {
-  // Configuration des broches du moteur droit
+  // Configure les broches du moteur droit
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, RIGHT_MOTOR_FWD);
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, RIGHT_MOTOR_BWD);
-
-  // Configuration des broches du moteur gauche
+  
+  // Configure les broches du moteur gauche
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1A, LEFT_MOTOR_FWD);
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1B, LEFT_MOTOR_BWD);
 
-  // Configure MCPWM parameters
+
+  // Configuration du PWM des moteurs
   mcpwm_config_t pwm_config;
-  pwm_config.frequency = 5000;              // Fréquence PWM de 5 kHz
-  pwm_config.cmpr_a = 0;                    // Moteurs arrêtés au départ
+  pwm_config.frequency = 5000;              // Fréquence de 5 kHz
+  pwm_config.cmpr_a = 0;                    // Rapport cyclique à 0 % au départ
   pwm_config.cmpr_b = 0;
   pwm_config.counter_mode = MCPWM_UP_COUNTER;
   pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
@@ -71,28 +69,31 @@ void rcCar_setup()
   mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_1, &pwm_config);
 
 
-  // S'assure que les moteurs sont arrêtés au démarrage
+  // Arrête les moteurs au démarrage
   rcCar_stop();
 
 
-  // Configuration du PWM des phares : 5 kHz et résolution de 8 bits
+  // Configure le PWM des phares
   ledcSetup(lights_pwm_channel, 5000, 8);
   ledcAttachPin(LIGHTS_PIN, lights_pwm_channel);
-  ledcWrite(lights_pwm_channel, 0); // Phares éteints au départ
+  ledcWrite(lights_pwm_channel, 0);
 
 
-  // Initialisation du NeoPixel de la batterie
+  // Initialise le NeoPixel
   pixelsBattery.begin();
   pixelsBattery.setBrightness(255);
-  pixelsBattery.fill(0x0000FF); // Bleu au démarrage
+  pixelsBattery.fill(0x0000FF);      // Bleu au démarrage
   pixelsBattery.show();
 }
 
 
-// Arrête immédiatement les deux moteurs
+// ==================== ARRÊT DES MOTEURS ====================
+
 void rcCar_stop(){
+
   Serial.println("Stopping motors");
 
+  // Met toutes les sorties des moteurs à 0 %
   mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
   mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 0);
   mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, 0);
@@ -100,24 +101,23 @@ void rcCar_stop(){
 }
 
 
-/**
- * Update battery status LED color based on battery percentage
- * Color thresholds:
- *   - Red: <20%
- *   - Yellow: 20-50%
- *   - Green: >50%
- */
+// ==================== BATTERIE ====================
+
+// Change la couleur du NeoPixel selon le niveau de batterie
 void updateBatteryLED(int batteryPercentage) {
 
   if(batteryPercentage < BATTERY_RED_THRESHOLD) {
+
     Serial.println("Battery low, setting LED to red");
     pixelsBattery.fill(0xFF0000);         // Rouge = batterie faible
 
   } else if (batteryPercentage < BATTERY_YELLOW_THRESHOLD) {
+
     Serial.println("Battery medium, setting LED to yellow");
     pixelsBattery.fill(0xFFFF00);         // Jaune = batterie moyenne
 
   } else {
+
     Serial.println("Battery good, setting LED to green");
     pixelsBattery.fill(0x00FF00);         // Vert = batterie bonne
   }
@@ -125,24 +125,23 @@ void updateBatteryLED(int batteryPercentage) {
   pixelsBattery.show();
 }
 
-/**
- * Read battery voltage via ADC
- */
+
+// Lit la tension de la batterie et calcule son pourcentage
 void getBatteryPercentage() {
 
   Serial.println("-------------- Reading battery voltage --------------");
 
-  // Conversion de la lecture ADC en tension réelle de batterie
+  // Convertit la lecture ADC en tension
   float voltage = analogRead(ADC_BATTERY_PIN) / 4095.0f * 3.3f * 2 + 0.24f;
 
   Serial.print("Voltage: ");
   Serial.println(voltage);
+  
 
-
-  // Transforme la tension entre MIN_VOLTAGE et MAX_VOLTAGE en 0 à 100 %
+  // Convertit la tension en pourcentage de 0 à 100 %
   int batteryPercentage = map(voltage * 1000, MIN_VOLTAGE * 1000, MAX_VOLTAGE * 1000, 0, 100);
 
-  // Empêche le pourcentage de dépasser 0 à 100 %
+  // Limite le résultat entre 0 et 100 %
   if (batteryPercentage > 100) batteryPercentage = 100;
   if (batteryPercentage < 0) batteryPercentage = 0;
 
@@ -156,119 +155,136 @@ void getBatteryPercentage() {
 }
 
 
-/**
- * ESP-NOW receive callback - processes incoming JSON commands from remote controller
- * Parses JSON message containing:
- *   - Joystick X/Y values (0-127, center ~64)
- *   - Button states (digital on/off)
- *   - Trigger values (analog 0-255)
- * 
- * @param mac Sender's MAC address (not used in this implementation)
- * @param incomingData Pointer to received data buffer
- * @param len Length of received data
- */
+// ==================== COMMUNICATION ESP-NOW ====================
+
+// Fonction appelée automatiquement lorsqu'un message ESP-NOW est reçu
 void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
 
-  // Vérifie que le message n'est pas trop gros pour le tableau
+  // Vérifie que le message n'est pas trop grand
   if (len >= sizeof(incomingMessage.command)) {
+
     Serial.println("Error: Incoming data too large!");
     return;
   }
 
 
-  // Copie les données reçues dans notre structure
+  // Copie le message reçu
   memcpy(incomingMessage.command, incomingData, len);
-  incomingMessage.command[len] = '\0'; // Ajoute la fin de chaîne
+  incomingMessage.command[len] = '\0';
 
 
   // ==================== LECTURE DU JSON ====================
-
+  
   JsonDocument doc;
+
+  // Transforme le message reçu en données JSON utilisables
   DeserializationError error = deserializeJson(doc, incomingMessage.command);
 
-  // Arrête le traitement si le JSON est invalide
+
+  // Vérifie si le JSON est valide
   if (error) {
+
     Serial.print("deserializeJson() failed: ");
     Serial.println(error.f_str());
     return;
   }
 
-  int x = 0, y = 0; // Joystick values
+
+  // Valeurs X et Y du joystick
+  int x = 0, y = 0;
   
-  // Iterate through JSON key-value pairs
+
+  // Parcourt toutes les informations contenues dans le JSON
   for (JsonPair kv : doc.as<JsonObject>()) {
 
     const char* key = kv.key().c_str();
 
 
-    // ==================== GESTION DES BOUTONS ====================
-
+    // ==================== BOUTONS ====================
+    
+    // Vérifie si la valeur reçue est un bouton (true ou false)
     if (kv.value().is<bool>()) {
+
 
       // Sauvegarde l'ancien et le nouvel état du bouton SELECT
       if (strcmp(key, "Se") == 0) {
+
         previousSeState = currentSeState;
         currentSeState = kv.value().as<bool>();
       }
 
 
-      // Traite les boutons lorsqu'ils deviennent false
+      // Traite le bouton lorsque sa valeur est false
       if(!kv.value().as<bool>()) {
 
+
+        // Bouton SELECT : allume ou éteint les phares
         if (strcmp(key, "Se") == 0) {
 
-          // SELECT permet d'allumer ou d'éteindre les phares
           if (!currentSeState && previousSeState) {
+
             Serial.println("SELECT button pressed, toggling lights");
             toggleLights();
-          }
+          } 
 
+
+        // Bouton U : haute puissance des phares
         } else if (strcmp(key, "U") == 0) {
 
-          // Bouton U : phares à haute puissance
           if (LED_STATE) {
+
             Serial.println("U button pressed, setting lights to high beam power");
+
             lights_power = HIGH_BEAM_POWER;
             ledcWrite(lights_pwm_channel, percentToPWM(lights_power));
           }
 
+
+        // Bouton D : basse puissance des phares
         } else if (strcmp(key, "D") == 0) {
 
-          // Bouton D : phares à basse puissance
           if (LED_STATE) {
+
             Serial.println("D button pressed, setting lights to low beam power");
+
             lights_power = LOW_BEAM_POWER;
             ledcWrite(lights_pwm_channel, percentToPWM(lights_power));
           }
         }
       }
+    }
 
 
-    // ==================== GESTION DU JOYSTICK ====================
-
-    } else if (kv.value().is<int>()) {
+    // ==================== JOYSTICK ====================
+    
+    // Vérifie si la valeur reçue est un nombre
+    else if (kv.value().is<int>()) {
 
       int analogValue = kv.value().as<int>();
 
-      // jRX = direction gauche/droite
+
+      // Axe X = direction gauche/droite
       if (strcmp(key, "jRX") == 0) {
+
         x = analogValue;
 
-      // jRY = avance/recul
+
+      // Axe Y = avance/recul
       } else if (strcmp(key, "jRY") == 0) {
+
         y = analogValue;
       }
     }
   }
   
-  // Send joystick values to motor control function
+
+  // Envoie X et Y à la fonction qui contrôle les moteurs
   rcCar_cmd(x, y);
 }
 
-/**
- * Toggle headlight LED on/off
- * Switches between current brightness level and off
- */
+
+// ==================== CONTRÔLE DES PHARES ====================
+
 void toggleLights() {
 
   if(LED_STATE) {
@@ -279,70 +295,57 @@ void toggleLights() {
 
   } else {
 
-    // Allume les phares à la puissance actuellement sélectionnée
+    // Allume les phares à la puissance sélectionnée
     ledcWrite(lights_pwm_channel, percentToPWM(lights_power));
     LED_STATE = true;
   }
 }
 
 
-/**
- * Motor control based on joystick input
- * Implements:
- *   - Dual motor differential steering (tank style)
- *   - Safety check: motors disabled when device is tilted (implemented)
- *   - Dead zone: ignores small joystick movements (<10)
- *   - Turn factor: reduces speed during sharp turns
- *   - Duty cycle mapping: joystick (-100 to 100) → PWM (0-100%)
- * 
- * @param x Right joystick X value (steering): -127 (left) to +127 (right)
- * @param y Right joystick Y value (throttle): -127 (backward) to +127 (forward)
- */
+// ==================== CONTRÔLE DES MOTEURS ====================
+
+// Contrôle la direction et la vitesse selon le joystick
 void rcCar_cmd(int x, int y) {
 
 
-  // ==================== SÉCURITÉ D'INCLINAISON ====================
-
-  // Arrête immédiatement les moteurs si une inclinaison est détectée
+  // Arrête les moteurs si une inclinaison est détectée
   if (tiltDetected) {
+
     Serial.println("Tilt detected - motors disabled for safety");
     rcCar_stop();
     return;
   }
 
 
-  // Affiche les valeurs reçues du joystick
+  // Affiche les valeurs du joystick
   Serial.printf("Joystick X: %d, Y: %d\n", x, y);
 
 
-  // ==================== ZONE MORTE DU JOYSTICK ====================
-
-  // Arrête les moteurs si le joystick est près de sa position centrale
+  // Zone morte : arrête les moteurs lorsque le joystick est près du centre
   if (abs(x) < 10 && abs(y) < 10) {
-    Serial.println("X and Y below threshold, stopping motors");
-    rcCar_stop();
+
+        Serial.println("X and Y below threshold, stopping motors");
+        rcCar_stop();
   }
 
 
-  // ==================== FACTEUR DE VIRAGE ====================
+  // ==================== CALCUL DU VIRAGE ====================
 
-  // Réduit légèrement la vitesse lors d'un virage
+  // Réduit légèrement la vitesse lors des virages
   float turn_factor = 1.0f - pow(abs(x) / 100.0f, 2.0f);
 
   // Limite le facteur entre 90 % et 100 %
   turn_factor = max(0.9f, min(1.0f, turn_factor));
 
 
-  // ==================== CALCUL DE LA DIRECTION ====================
-
-  // Inverse la direction du volant lorsque la voiture recule
+  // Inverse la direction X lorsque la voiture recule
   int adjusted_x = (y < -10) ? -x : x;
+  
 
-
-  // Influence de la direction sur la vitesse des moteurs
+  // Le X influence les moteurs à 50 %
   float weight = 0.5f;
 
-  // Mélange l'accélération Y et la direction X pour chaque moteur
+  // Calcule la vitesse de chaque moteur avec X et Y
   int duty_cycle_right = y - (adjusted_x * weight);
   int duty_cycle_left = y + (adjusted_x * weight);
 
@@ -352,7 +355,7 @@ void rcCar_cmd(int x, int y) {
   duty_cycle_left *= turn_factor;
 
 
-  // Limite les commandes des moteurs entre -100 % et +100 %
+  // Limite les valeurs entre -100 et 100
   duty_cycle_right = max(-100, min(100, duty_cycle_right));
   duty_cycle_left = max(-100, min(100, duty_cycle_left));
 
@@ -364,15 +367,15 @@ void rcCar_cmd(int x, int y) {
 
   if (duty_cycle_right > 0) {
 
-    // Marche avant
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, duty_cycle_right);
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 0);
+      // Marche avant
+      mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, duty_cycle_right);
+      mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, 0);
 
   } else {
 
-    // Marche arrière
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, -duty_cycle_right);
+      // Marche arrière
+      mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 0);
+      mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, -duty_cycle_right);
   }
 
 
@@ -380,14 +383,14 @@ void rcCar_cmd(int x, int y) {
 
   if (duty_cycle_left > 0) {
 
-    // Marche avant
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, 0);
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, duty_cycle_left);
+      // Marche avant
+      mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, 0);
+      mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, duty_cycle_left);
 
   } else {
 
-    // Marche arrière
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, -duty_cycle_left);
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, 0);
+      // Marche arrière
+      mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, -duty_cycle_left);
+      mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_B, 0);
   }
 }
