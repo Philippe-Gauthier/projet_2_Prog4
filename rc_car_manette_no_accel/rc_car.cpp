@@ -1,3 +1,5 @@
+// Définition des fonctions utilisées dans le code
+
 #include "rc_car.h"
 #include "Arduino.h"
 #include "driver/mcpwm.h"
@@ -12,21 +14,26 @@ const int lights_pwm_channel = 0;
 // ==================== EXTERNAL GLOBAL VARIABLES ====================
 // (Declared in main.cpp)
 
+// Déclarations des variables globales pour les lumières
 extern bool LED_STATE;
 extern bool previousSeState;
 extern bool currentSeState;
 extern bool tiltDetected;
 extern Adafruit_NeoPixel pixelsBattery;
 
+// Structure pour la réception des commandes
 typedef struct struct_message {
   char command[256];
 } struct_message;
 
+// Définition d'une variable pour la commande reçue
 extern struct_message incomingMessage;
 
+// Définition d'une variable pour l'intensité de la lumière
 // Lights power percentage (used for PWM mapping)
 int lights_power = HIGH_BEAM_POWER; // default to high beam percentage (0-100)
 
+// Fonction pour gérer la vitesse des moteur de pourcentage à PWM
 /**
  * Convert a 0-100 percentage into 8-bit PWM value (0-255)
  * @param percent Input percentage (0-100)
@@ -39,6 +46,7 @@ static uint8_t percentToPWM(int percent) {
 
 // ==================== MOTOR CONTROL ====================
 
+// Fonction pour l'initialization et la configuration des moteurs 
 /**
  * Initialize motor control using MCPWM (Motor Control PWM)
  * Configures PWM for dual motor control:
@@ -48,6 +56,7 @@ static uint8_t percentToPWM(int percent) {
  */
 void rcCar_setup()
 {
+  // Initialization des pins des moteurs
   // Initialize MCPWM GPIO pins
   // Right motor: Forward (MCPWM0A) and Backward (MCPWM0B)
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, RIGHT_MOTOR_FWD);
@@ -57,6 +66,7 @@ void rcCar_setup()
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1A, LEFT_MOTOR_FWD);
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1B, LEFT_MOTOR_BWD);
 
+  // Configuration des différents paramètres pour le contrôle des moteurs
   // Configure MCPWM parameters
   mcpwm_config_t pwm_config;
   pwm_config.frequency = 5000;              // 5kHz PWM frequency
@@ -65,19 +75,23 @@ void rcCar_setup()
   pwm_config.counter_mode = MCPWM_UP_COUNTER;
   pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
 
+  // Initialization des timers pour les moteurs
   // Initialize MCPWM timers for both motors
   mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config); // Timer 0 for right motor
   mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_1, &pwm_config); // Timer 1 for left motor
 
+  // Appel de la fonction pour arrêter les moteurs
   // Stop motors initially
   rcCar_stop();
 
+  // Initialization de la lumière pour indiquer le PWM
   // Initialize LEDC for lights PWM control
   ledcSetup(lights_pwm_channel, 5000, 8); // 5kHz frequency, 8-bit resolution
   ledcAttachPin(LIGHTS_PIN, lights_pwm_channel);
   // initialize pin to off
   ledcWrite(lights_pwm_channel, 0);
 
+  // Initialization du néopixel
   // Initialize NeoPixel RGB LEDs
   pixelsBattery.begin();
   pixelsBattery.setBrightness(255);  // Set brightness to 30/255
@@ -85,6 +99,7 @@ void rcCar_setup()
   pixelsBattery.show();
 }
 
+// Fonction pour arrêter les moteurs et indiquer l'arrêt des moteurs dans le terminal
 /**
  * Stop all motors immediately (emergency stop)
  * Sets all PWM duty cycles to 0%
@@ -99,6 +114,7 @@ void rcCar_stop(){
 
 // ==================== BATTERY MONITORING ====================
 
+// Fonction pour changer la couleur de la lumière et envoyer un message dans le terminal selon le pourcentage de la batterie
 /**
  * Update battery status LED color based on battery percentage
  * Color thresholds:
@@ -120,6 +136,7 @@ void updateBatteryLED(int batteryPercentage) {
   pixelsBattery.show();
 }
 
+// Fonction pour obtenir le pourcentage de la batterie et pour indiquer le pourcentage dans le terminal
 /**
  * Read battery voltage via ADC
  */
@@ -127,10 +144,12 @@ void getBatteryPercentage() {
   // Read ADC value and convert to voltage
   // ADC formula: voltage = (ADC / 4095) * 3.3V * 2 + calibration offset
   Serial.println("-------------- Reading battery voltage --------------");
+  // Lecture de la valeur mesurée et transformation en voltage
   float voltage = analogRead(ADC_BATTERY_PIN) / 4095.0f * 3.3f * 2 + 0.24f;
   Serial.print("Voltage: ");
   Serial.println(voltage);
   
+  // Convertir le voltage de la batterue en pourcentage
   // Convert voltage to battery percentage using MIN_VOLTAGE and MAX_VOLTAGE
   int batteryPercentage = map(voltage * 1000, MIN_VOLTAGE * 1000, MAX_VOLTAGE * 1000, 0, 100);
   if (batteryPercentage > 100) batteryPercentage = 100;
@@ -139,12 +158,14 @@ void getBatteryPercentage() {
   Serial.print("Battery Percentage: ");
   Serial.println(batteryPercentage);
 
+  // Changer la couleur de la lumière selon le pourcentage
   // Update NeoPixel LED color based on battery level
   updateBatteryLED(batteryPercentage);
 }
 
 // ==================== ESP-NOW COMMUNICATION ====================
 
+// Fonction pour la réception de données du ESP
 /**
  * ESP-NOW receive callback - processes incoming JSON commands from remote controller
  * Parses JSON message containing:
@@ -178,6 +199,7 @@ void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
     return;
   }
 
+  // Lecture des valeurs du joystick et du boutton
   int x = 0, y = 0; // Joystick values
   
   // Iterate through JSON key-value pairs
@@ -234,10 +256,12 @@ void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
     }
   }
   
+  // Envoyer les valeurs du joystick à la fonction de controle des moteurs
   // Send joystick values to motor control function
   rcCar_cmd(x, y);
 }
 
+// Fonction pour allumer ou fermer les lumières
 /**
  * Toggle headlight LED on/off
  * Switches between current brightness level and off
@@ -254,6 +278,7 @@ void toggleLights() {
 
 // ==================== MOTOR COMMAND & CONTROL LOGIC ====================
 
+// Fonction pour contrôler les moteus
 /**
  * Motor control based on joystick input
  * Implements:
