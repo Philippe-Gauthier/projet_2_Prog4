@@ -1,5 +1,3 @@
-// Définitions de pins et de certaines variables
-
 #ifndef USER_DEFINE_H
 #define USER_DEFINE_H
 
@@ -26,27 +24,22 @@
 #define HREF_GPIO_NUM     5
 #define PCLK_GPIO_NUM     13
 
-// Définition des pins pour les lumières et la batterie
 // Board IOs
 #define NEOPIXEL_BATTERY_PIN 4
 #define NEOPIXEL_BATTERY_NUMBER 1
 #define ADC_BATTERY_PIN 1
 #define LIGHTS_PIN 43
-// Définition des voltages maximum et minimum
 #define MAX_VOLTAGE 4.2  // Maximum expected battery voltage (adjust according to your battery)
 #define MIN_VOLTAGE 3.5  // Minimum acceptable battery voltage (adjust according to your battery)
 
-// Définition des pourcentages pour définir la couleur du néopixel
 // Battery percentage thresholds for neopixel color changes
 #define BATTERY_RED_THRESHOLD 20
 #define BATTERY_YELLOW_THRESHOLD 50
 
-// Définition des pourcentages de l'intensité des lumières
 // Headlight power levels
 #define HIGH_BEAM_POWER 100
 #define LOW_BEAM_POWER 50
 
-// Définition des pins pour les moteurs
 // Motors pins
 #define RIGHT_MOTOR_FWD 2
 #define RIGHT_MOTOR_BWD 45
@@ -55,11 +48,9 @@
 #define LEFT_MOTOR_FWD 44
 #define LEFT_MOTOR_BWD 42
 
-// Définition de la pin du boutton 
 // button pin
 #define BUTTON_PIN 0
 
-// Définition de l'intensité de la néopixel
 // Neopixel brightness levels
 #define NEOPIXEL_BRIGHTNESS 100 // Adjust brightness (0-255)
 

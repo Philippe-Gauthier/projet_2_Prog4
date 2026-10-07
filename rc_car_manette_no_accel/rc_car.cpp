@@ -1,5 +1,3 @@
-// Définition des fonctions utilisées dans le code
-
 #include "rc_car.h"
 #include "Arduino.h"
 #include "driver/mcpwm.h"
@@ -30,14 +28,11 @@ typedef struct struct_message {
   char command[256];
 } struct_message;
 
-// Définition d'une variable pour la commande reçue
 extern struct_message incomingMessage;
 
-// Définition d'une variable pour l'intensité de la lumière
 // Lights power percentage (used for PWM mapping)
 int lights_power = HIGH_BEAM_POWER; // default to high beam percentage (0-100)
 
-// Fonction pour gérer la vitesse des moteur de pourcentage à PWM
 /**
  * Convert a 0-100 percentage into 8-bit PWM value (0-255)
  * @param percent Input percentage (0-100)
@@ -62,7 +57,6 @@ void rcCar_setup()
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1A, LEFT_MOTOR_FWD);
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1B, LEFT_MOTOR_BWD);
 
-  // Configuration des différents paramètres pour le contrôle des moteurs
   // Configure MCPWM parameters
   mcpwm_config_t pwm_config;
   pwm_config.frequency = 5000;              // Fréquence PWM de 5 kHz
@@ -106,9 +100,13 @@ void rcCar_stop(){
 }
 
 
-// ==================== SURVEILLANCE DE LA BATTERIE ====================
-
-// Change la couleur du NeoPixel selon le pourcentage de batterie
+/**
+ * Update battery status LED color based on battery percentage
+ * Color thresholds:
+ *   - Red: <20%
+ *   - Yellow: 20-50%
+ *   - Green: >50%
+ */
 void updateBatteryLED(int batteryPercentage) {
 
   if(batteryPercentage < BATTERY_RED_THRESHOLD) {
@@ -127,7 +125,6 @@ void updateBatteryLED(int batteryPercentage) {
   pixelsBattery.show();
 }
 
-// Fonction pour obtenir le pourcentage de la batterie et pour indiquer le pourcentage dans le terminal
 /**
  * Read battery voltage via ADC
  */
@@ -159,7 +156,6 @@ void getBatteryPercentage() {
 }
 
 
-// Fonction pour la réception de données du ESP
 /**
  * ESP-NOW receive callback - processes incoming JSON commands from remote controller
  * Parses JSON message containing:
@@ -197,7 +193,6 @@ void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
     return;
   }
 
-  // Lecture des valeurs du joystick et du boutton
   int x = 0, y = 0; // Joystick values
   
   // Iterate through JSON key-value pairs
@@ -266,12 +261,10 @@ void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
     }
   }
   
-  // Envoyer les valeurs du joystick à la fonction de controle des moteurs
   // Send joystick values to motor control function
   rcCar_cmd(x, y);
 }
 
-// Fonction pour allumer ou fermer les lumières
 /**
  * Toggle headlight LED on/off
  * Switches between current brightness level and off
@@ -293,7 +286,6 @@ void toggleLights() {
 }
 
 
-// Fonction pour contrôler les moteus
 /**
  * Motor control based on joystick input
  * Implements:

@@ -1,5 +1,3 @@
-// Initialization des fonctions utilisées dans le code
-
 #ifndef RC_CAR_H
 #define RC_CAR_H
 
@@ -24,7 +22,6 @@ void rcCar_stop();
 // Contrôle les moteurs avec les valeurs X et Y du joystick
 void rcCar_cmd(int x, int y);
 
-// Initialization des fonctions pour indiquer le pourcentage de la batterie
 // Battery Monitoring Function
 void getBatteryPercentage();
 
