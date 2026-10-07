@@ -1,3 +1,5 @@
+// Définition des fonctions utilisées dans le code
+
 #include "rc_car.h"
 #include "Arduino.h"
 #include "driver/mcpwm.h"
@@ -28,14 +30,19 @@ typedef struct struct_message {
   char command[256];
 } struct_message;
 
+// Définition d'une variable pour la commande reçue
 extern struct_message incomingMessage;
 
+// Définition d'une variable pour l'intensité de la lumière
+// Lights power percentage (used for PWM mapping)
+int lights_power = HIGH_BEAM_POWER; // default to high beam percentage (0-100)
 
-// Puissance actuelle des phares en pourcentage (0 à 100)
-int lights_power = HIGH_BEAM_POWER;
-
-
-// Convertit un pourcentage de 0-100 % en valeur PWM de 0-255
+// Fonction pour gérer la vitesse des moteur de pourcentage à PWM
+/**
+ * Convert a 0-100 percentage into 8-bit PWM value (0-255)
+ * @param percent Input percentage (0-100)
+ * @return PWM value (0-255)
+ */
 static uint8_t percentToPWM(int percent) {
   percent = constrain(percent, 0, 100);
   return (uint8_t)map(percent, 0, 100, 0, 255);
@@ -55,8 +62,8 @@ void rcCar_setup()
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1A, LEFT_MOTOR_FWD);
   mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1B, LEFT_MOTOR_BWD);
 
-
-  // Configuration du PWM des moteurs
+  // Configuration des différents paramètres pour le contrôle des moteurs
+  // Configure MCPWM parameters
   mcpwm_config_t pwm_config;
   pwm_config.frequency = 5000;              // Fréquence PWM de 5 kHz
   pwm_config.cmpr_a = 0;                    // Moteurs arrêtés au départ
@@ -120,8 +127,10 @@ void updateBatteryLED(int batteryPercentage) {
   pixelsBattery.show();
 }
 
-
-// Lit la tension de la batterie et calcule son pourcentage
+// Fonction pour obtenir le pourcentage de la batterie et pour indiquer le pourcentage dans le terminal
+/**
+ * Read battery voltage via ADC
+ */
 void getBatteryPercentage() {
 
   Serial.println("-------------- Reading battery voltage --------------");
@@ -150,9 +159,18 @@ void getBatteryPercentage() {
 }
 
 
-// ==================== COMMUNICATION ESP-NOW ====================
-
-// Fonction appelée automatiquement lorsqu'un message ESP-NOW est reçu
+// Fonction pour la réception de données du ESP
+/**
+ * ESP-NOW receive callback - processes incoming JSON commands from remote controller
+ * Parses JSON message containing:
+ *   - Joystick X/Y values (0-127, center ~64)
+ *   - Button states (digital on/off)
+ *   - Trigger values (analog 0-255)
+ * 
+ * @param mac Sender's MAC address (not used in this implementation)
+ * @param incomingData Pointer to received data buffer
+ * @param len Length of received data
+ */
 void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
 
   // Vérifie que le message n'est pas trop gros pour le tableau
@@ -179,12 +197,10 @@ void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
     return;
   }
 
-
-  // Valeurs du joystick : X = direction et Y = avance/recul
-  int x = 0, y = 0;
-
-
-  // Parcourt toutes les données reçues dans le JSON
+  // Lecture des valeurs du joystick et du boutton
+  int x = 0, y = 0; // Joystick values
+  
+  // Iterate through JSON key-value pairs
   for (JsonPair kv : doc.as<JsonObject>()) {
 
     const char* key = kv.key().c_str();
@@ -249,14 +265,17 @@ void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
       }
     }
   }
-
-
-  // Envoie les valeurs du joystick à la fonction de contrôle des moteurs
+  
+  // Envoyer les valeurs du joystick à la fonction de controle des moteurs
+  // Send joystick values to motor control function
   rcCar_cmd(x, y);
 }
 
-
-// Allume ou éteint les phares
+// Fonction pour allumer ou fermer les lumières
+/**
+ * Toggle headlight LED on/off
+ * Switches between current brightness level and off
+ */
 void toggleLights() {
 
   if(LED_STATE) {
@@ -274,9 +293,19 @@ void toggleLights() {
 }
 
 
-// ==================== COMMANDE DES MOTEURS ====================
-
-// Contrôle les deux moteurs selon les valeurs X et Y du joystick
+// Fonction pour contrôler les moteus
+/**
+ * Motor control based on joystick input
+ * Implements:
+ *   - Dual motor differential steering (tank style)
+ *   - Safety check: motors disabled when device is tilted (implemented)
+ *   - Dead zone: ignores small joystick movements (<10)
+ *   - Turn factor: reduces speed during sharp turns
+ *   - Duty cycle mapping: joystick (-100 to 100) → PWM (0-100%)
+ * 
+ * @param x Right joystick X value (steering): -127 (left) to +127 (right)
+ * @param y Right joystick Y value (throttle): -127 (backward) to +127 (forward)
+ */
 void rcCar_cmd(int x, int y) {
 
 
