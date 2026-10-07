@@ -1,7 +1,11 @@
 #ifndef USER_DEFINE_H
 #define USER_DEFINE_H
 
-// Camera pins
+// Empêche ce fichier d'être inclus plusieurs fois
+
+
+// ==================== BROCHES DE LA CAMÉRA ====================
+
 #define PWDN_GPIO_NUM     -1
 #define RESET_GPIO_NUM    6
 #define XCLK_GPIO_NUM     10
@@ -20,35 +24,63 @@
 #define HREF_GPIO_NUM     5
 #define PCLK_GPIO_NUM     13
 
-// Board IOs
+
+// ==================== ENTRÉES / SORTIES DE LA CARTE ====================
+
+// NeoPixel utilisé pour afficher l'état de la batterie
 #define NEOPIXEL_BATTERY_PIN 4
 #define NEOPIXEL_BATTERY_NUMBER 1
-#define ADC_BATTERY_PIN 1
-#define LIGHTS_PIN 43
-#define MAX_VOLTAGE 4.2  // Maximum expected battery voltage (adjust according to your battery)
-#define MIN_VOLTAGE 3.5  // Minimum acceptable battery voltage (adjust according to your battery)
 
-// Battery percentage thresholds for neopixel color changes
+// Entrée analogique utilisée pour mesurer la batterie
+#define ADC_BATTERY_PIN 1
+
+// Broche utilisée pour les phares
+#define LIGHTS_PIN 43
+
+// Tensions maximale et minimale utilisées pour calculer le % de batterie
+#define MAX_VOLTAGE 4.2
+#define MIN_VOLTAGE 3.5
+
+
+// ==================== NIVEAUX DE BATTERIE ====================
+
+// Seuils utilisés pour changer la couleur du NeoPixel
 #define BATTERY_RED_THRESHOLD 20
 #define BATTERY_YELLOW_THRESHOLD 50
 
-// Headlight power levels
-#define HIGH_BEAM_POWER 100
-#define LOW_BEAM_POWER 50
 
-// Motors pins
+// ==================== PUISSANCE DES PHARES ====================
+
+#define HIGH_BEAM_POWER 100  // Haute puissance : 100 %
+#define LOW_BEAM_POWER 50    // Basse puissance : 50 %
+
+
+// ==================== BROCHES DES MOTEURS ====================
+
+// Moteur droit
 #define RIGHT_MOTOR_FWD 2
 #define RIGHT_MOTOR_BWD 45
+
+// Moteur gauche
 #define LEFT_MOTOR_FWD 44
 #define LEFT_MOTOR_BWD 42
 
-// button pin
+
+// ==================== BOUTON ====================
+
 #define BUTTON_PIN 0
 
-// Neopixel brightness levels
-#define NEOPIXEL_BRIGHTNESS 100 // Adjust brightness (0-255)
 
-// DEBUG
+// ==================== NEOPIXEL ====================
+
+// Luminosité du NeoPixel (0 à 255)
+#define NEOPIXEL_BRIGHTNESS 100
+
+
+// ==================== MODE DEBUG ====================
+
+// 1 = debug activé, 0 = debug désactivé
 #define DEBUG 1
+
 
 #endif // USER_DEFINE_H
