@@ -24,8 +24,6 @@ __Methodes__
 * Privé :
     * convert_raw() : float
 
-  
-
 ### Commande
 
 - **Mère :** `message`
@@ -34,18 +32,19 @@ __Methodes__
 
 ## Attributs
 
-- * Public :
+- **Public :**
   - `char command[256]` : commande reçue
 
-- * Privé :
+- **Privé :**
   - Aucun
 
-
 ## Méthodes
-- * Public :
-   - ` Joystick_Bouton() : String`
-   - ` decoding_JSON(String message) : void`
-- * Privé :
+
+- **Public :**
+  - `reception_Message(const uint8_t *incomingData, int len) : String`
+  - `decoding_JSON(String message) : void`
+
+- **Privé :**
   - Aucun
   
 ### Information
