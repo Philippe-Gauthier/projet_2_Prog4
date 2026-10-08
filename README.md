@@ -1,5 +1,6 @@
 # projet_2_Prog4
 
+<<<<<<< Updated upstream
 ### batterie
 __Attribue__
 * Publique :
@@ -151,3 +152,36 @@ Public:
 ```
 
     
+=======
+## Lumière
+
+### Attributs
+
+* Publique
+
+  * `bool LED_STATE;`
+  * `int Neopixel_brightness; // utilisé durant l'initialisation`
+  * `int lights_power; // 0 à 100`
+  * `int battery_state; // 0 à 3, int indicant le niveau de la batterie: (0: inconnue/erreur, 1: rouge, 2: jaune, 3: verte))`
+* Privé
+
+  * `const int lights_pwm_channel = 0; // utilisé par write2LED`
+  * `Adafruit_NeoPixel pixelsBattery(int NEOPIXEL_BATTERY_NUMBER, int NEOPIXEL_BATTERY_PIN, NEO_GRB + NEO_KHZ800);`
+  * `const int Neopixel_battery_pin;`
+  * `const int Neopixel_battery_number;`
+  * `const int BATTERY_RED_THRESHOLD;`
+  * `const int BATTERY_YELLOW_THRESHOLD;`
+  * `const int lights_pin;`
+
+### Méthode
+
+* Publique
+
+  * `void toggleLights();`
+  * `void write2LED(int pourcentage (entre 1 et 100));`
+* Privé
+
+  * `void setupLights();`
+  * `static uint8_t percentToPWM(int percent); // est utilisé par write2LED`
+  * `int updateBatteryLED(int batteryPercentage); // Fonction qui met à jour la couleur de la batterie et la valeur "battery_state" avec la valeur retournée`
+>>>>>>> Stashed changes
