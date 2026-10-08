@@ -34,14 +34,20 @@ __Methodes__
 
 ## Attributs
 
-Aucun
+- * Public :
+  - `char command[256]` : commande reçue
+
+- * Privé :
+  - Aucun
+
 
 ## Méthodes
-
-- `String Joystick_Bouton()`
-- `void decoding_JSON(String message)`
-
-
+- * Public :
+   - ` Joystick_Bouton() : String`
+   - ` decoding_JSON(String message) : void`
+  - * Privé :
+  - Aucun
+  
 ### Information
 
 Rôle : Récupérer les données de la batterie et de l'accéléromètre, les encoder en JSON et les transmettre à la classe Message.
