@@ -41,9 +41,6 @@ Aucun
 - `String Joystick_Bouton()`
 - `void decoding_JSON(String message)`
 
-# projet_2_Prog4
-
-
 
 ### Information
 
