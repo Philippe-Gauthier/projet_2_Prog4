@@ -23,3 +23,23 @@ __Methodes__
     * updateBatteryLED(): void
 * Privé :
     * convert_raw() : float
+
+  
+
+### Commande
+
+- **Mère :** `message`
+- **Enfant 1 :** `moteur`
+- **Enfant 2 :** `lumière`
+
+## Attributs
+
+Aucun
+
+## Méthodes
+
+- `String Joystick_Bouton()`
+- `void decoding_JSON(String message)`
+
+# projet_2_Prog4
+  
