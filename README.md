@@ -45,7 +45,7 @@ __Methodes__
 - * Public :
    - ` Joystick_Bouton() : String`
    - ` decoding_JSON(String message) : void`
-  - * Privé :
+- * Privé :
   - Aucun
   
 ### Information
