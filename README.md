@@ -97,3 +97,57 @@ Rôle : Récupérer les données de la batterie et de l'accéléromètre, les en
 
 - **Privé :**
   - Aucune méthode.
+
+
+  # projet_2_Prog4
+
+
+## Jérémy : Accéléromètre
+* class Accéléromètre : Information {
+
+## Attributs
+Private:
+* std::list<int> Donnée_Brute = [1, 2, 3]
+* int Threshold = 50
+* float Acceleration = 0.0
+* String Direction = " "
+  
+## Méthodes
+Private:
+```
+  list<int> Get_values() { // lecture des registres
+    Value_list = [];
+    read all the registers;
+    append into list;
+    return Value_list;
+    }
+```
+```
+  void update_values(Get_values, ) { // Met les attributs à jour
+    for ((i=0 and i<3)i++):
+      this->Données_Brute = list;
+    New_Acceleration = calcul pour faire la conversion
+    this->Acceleration = New_Acceleration;
+    if (New_Acceleration > 0):
+      New_direction = "Avance"
+    else if (New_Acceleration < 0):
+      New_direction = "Recule"
+    this->Direction = New_direction;
+}
+```
+Public:
+```
+  void Set_Threshold(int tilt) {
+    this->Threshold = tilt;
+    }
+```
+```
+  bool Error_check(int thresh, std::list<int> data) {
+    if (data[x] > thresh):
+      return True
+    else:
+      return False
+  }
+```
+
+    
