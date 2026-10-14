@@ -96,6 +96,7 @@ envoie() : appelle encodage(), transmet le JSON à la classe Message et retourne
   - `int RIGHT_MOTOR_BWD` : Broche 45, marche arrière du moteur droit.
   - `int LEFT_MOTOR_FWD` : Broche 44, marche avant du moteur gauche.
   - `int LEFT_MOTOR_BWD` : Broche 42, marche arrière du moteur gauche.
+  - `bool tiltDetected` : Indique si la voiture est renversée (true) ou non (false).
 
 ## Méthodes
 
@@ -105,6 +106,7 @@ envoie() : appelle encodage(), transmet le JSON à la classe Message et retourne
   - `void rcCar_cmd(int x, int y)` : Calcule la vitesse et la direction des moteurs selon les valeurs du joystick.
     - `x` : Direction gauche/droite.
     - `y` : Déplacement avant/arrière.
+  -`void verifierInclinaison()` : Vérifie automatiquement si la voiture est renversée et arrête les moteurs avec rcCar_stop() si nécessaire.
 
 - **Privé :**
   - Aucune méthode.
