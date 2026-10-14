@@ -110,11 +110,21 @@ Rôle : Récupérer les données de la batterie et de l'accéléromètre, les en
 Private:
 * std::list<int> Donnée_Brute = [1, 2, 3]
 * int Threshold = 50
-* float Acceleration = 0.0
-* String Direction = " "
+* struct {
+  float Accel_X;
+  float Accel_Y;
+  float Accel_Z;
+} Acceleration_data;
+* String Direction = " " // juste pour afficher dans le terminal, aucun effet sur les moteurs
   
 ## Méthodes
 Private:
+```
+void Accel_init() {
+  démarrage ligne I2C et mise au point des registres au besoin
+}
+```
+
 ```
   list<int> Get_values() { // lecture des registres
     Value_list = [];
@@ -124,11 +134,12 @@ Private:
     }
 ```
 ```
+  // Modifier pour prendre conpte de la nouvelle structure
   void update_values(Get_values, ) { // Met les attributs à jour
     for ((i=0 and i<3)i++):
       this->Données_Brute = list;
     New_Acceleration = calcul pour faire la conversion
-    this->Acceleration = New_Acceleration;
+    this->Acceleration_Data = New_Acceleration;
     if (New_Acceleration > 0):
       New_direction = "Avance"
     else if (New_Acceleration < 0):
