@@ -143,9 +143,13 @@ void Accel_init() {
   void update_values(Get_values, ) { // Met les attributs à jour
     for ((i=0 and i<3)i++):
       this->Données_Brute = list;
-    New_Acceleration = calcul pour faire la conversion
-    this->Acceleration_Data = New_Acceleration;
-    if (New_Acceleration > 0):
+    New_Acceleration_X = calcul pour faire la conversion
+    New_Acceleration_Y = calcul pour faire la conversion
+    New_Acceleration_Z = calcul pour faire la conversion
+    this->Acceleration_Data.Accel_X = New_Acceleration_X;
+    this->Acceleration_Data.Accel_Y = New_Acceleration_Y;
+    this->Acceleration_Data.Accel_Z = New_Acceleration_Z;
+    if (Acceleration_data.Accel_X > 0):
       New_direction = "Avance"
     else if (New_Acceleration < 0):
       New_direction = "Recule"
