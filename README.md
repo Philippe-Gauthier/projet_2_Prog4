@@ -184,4 +184,36 @@ Public:
   * `void setupLights();`
   * `static uint8_t percentToPWM(int percent); // est utilisé par write2LED`
   * `int updateBatteryLED(int batteryPercentage); // Fonction qui met à jour la couleur de la batterie et la valeur "battery_state" avec la valeur retournée`
+ 
+
+## Robot
+
+__Attribues__
+* Publique :
+
+    * 
+
+* Privé : 
+    * controleurMoteurs moteurs;
+    * controleurLumieres lumieres;
+    * moniteurBatterie batterie;
+    * Accelerometre accelerometre;
+    * bool robotActif;
+    * bool tiltDetecte;
+
+
+__Méthodes__
+* Publique :
+    * begin()
+    * stop()
+    * update()
+* Privé :
+    * envoie_message_commande()
+    * reception_message_mannette()
+    * gererLumieres()
+    * gererMoteurs()
+    * gererAccelerometre()
+    * gererBatterie()
+ 
+
 >>>>>>> Stashed changes
