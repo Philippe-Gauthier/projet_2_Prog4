@@ -228,16 +228,17 @@ __Attribues__
 
 __Méthodes__
 * Publique :
-    * begin()
-    * stop()
-    * update()
+    * void begin()
+    * void stop()
+    * void update()
 * Privé :
-    * envoie_message_commande()
+    * envoie_message_commande(char command[])
     * reception_message_mannette()
-    * gererLumieres()
-    * gererMoteurs()
-    * gererAccelerometre()
-    * gererBatterie()
+    * void gererLumieres()
+    * void gererMoteurs()
+    * void gererAccelerometre()
+    * void gererBatterie()
+
 
 
 ## Message
