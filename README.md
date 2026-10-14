@@ -216,7 +216,8 @@ __Méthodes__
     * gererBatterie()
 
 
- ## Attributs
+## Message
+### Attributs
 **Public**:
     * `char command[256]`
     * `extern struct_message incomingMessage`
@@ -226,7 +227,7 @@ __Méthodes__
     * `struct_message`
     * `longueur_message`
 
-## Méthodes
+### Méthodes
 **Public**:
     * `void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len);`
 
