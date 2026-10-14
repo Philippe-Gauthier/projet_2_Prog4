@@ -226,7 +226,7 @@ __Attribues__
 
 __Méthodes__
 * Publique :
-    * void begin()
+    * void initialisation()
     * void stop()
     * void update()
 * Privé :
