@@ -34,7 +34,12 @@ __Methodes__
 ## Attributs
 
 - **Public :**
-  - `char command[256]` : commande reçue
+- struct Commandes_Manettes
+   - jRX : int — axe horizontal du joystick
+   - jRY : int — axe vertical du joystick
+   - Se : bool — état du bouton SELECT
+   - U : bool — état du bouton U
+   - D : bool — état du bouton D
 
 - **Privé :**
   - Aucun
@@ -91,6 +96,7 @@ envoie() : appelle encodage(), transmet le JSON à la classe Message et retourne
   - `int RIGHT_MOTOR_BWD` : Broche 45, marche arrière du moteur droit.
   - `int LEFT_MOTOR_FWD` : Broche 44, marche avant du moteur gauche.
   - `int LEFT_MOTOR_BWD` : Broche 42, marche arrière du moteur gauche.
+  - `bool tiltDetected` : Indique si la voiture est renversée (true) ou non (false).
 
 ## Méthodes
 
@@ -100,6 +106,7 @@ envoie() : appelle encodage(), transmet le JSON à la classe Message et retourne
   - `void rcCar_cmd(int x, int y)` : Calcule la vitesse et la direction des moteurs selon les valeurs du joystick.
     - `x` : Direction gauche/droite.
     - `y` : Déplacement avant/arrière.
+  -`void verifierInclinaison()` : Vérifie automatiquement si la voiture est renversée et arrête les moteurs avec rcCar_stop() si nécessaire.
 
 - **Privé :**
   - Aucune méthode.
@@ -115,11 +122,21 @@ envoie() : appelle encodage(), transmet le JSON à la classe Message et retourne
 Private:
 * std::list<int> Donnée_Brute = [1, 2, 3]
 * int Threshold = 50
-* float Acceleration = 0.0
-* String Direction = " "
+* struct {
+  float Accel_X;
+  float Accel_Y;
+  float Accel_Z;
+} Acceleration_data;
+* String Direction = " " // juste pour afficher dans le terminal, aucun effet sur les moteurs
   
 ## Méthodes
 Private:
+```
+void Accel_init() {
+  démarrage ligne I2C et mise au point des registres au besoin
+}
+```
+
 ```
   list<int> Get_values() { // lecture des registres
     Value_list = [];
@@ -129,12 +146,17 @@ Private:
     }
 ```
 ```
+  // Modifier pour prendre conpte de la nouvelle structure
   void update_values(Get_values, ) { // Met les attributs à jour
     for ((i=0 and i<3)i++):
       this->Données_Brute = list;
-    New_Acceleration = calcul pour faire la conversion
-    this->Acceleration = New_Acceleration;
-    if (New_Acceleration > 0):
+    New_Acceleration_X = calcul pour faire la conversion
+    New_Acceleration_Y = calcul pour faire la conversion
+    New_Acceleration_Z = calcul pour faire la conversion
+    this->Acceleration_Data.Accel_X = New_Acceleration_X;
+    this->Acceleration_Data.Accel_Y = New_Acceleration_Y;
+    this->Acceleration_Data.Accel_Z = New_Acceleration_Z;
+    if (Acceleration_data.Accel_X > 0):
       New_direction = "Avance"
     else if (New_Acceleration < 0):
       New_direction = "Recule"
@@ -164,7 +186,7 @@ Public:
 
 * Publique
 
-  * `bool LED_STATE;`
+  * `bool LED_STATE; // variable utilisée pour la fonction togglelights`
   * `int Neopixel_brightness; // utilisé durant l'initialisation`
   * `int lights_power; // 0 à 100`
   * `int battery_state; // 0 à 3, int indicant le niveau de la batterie: (0: inconnue/erreur, 1: rouge, 2: jaune, 3: verte))`
@@ -174,22 +196,19 @@ Public:
   * `Adafruit_NeoPixel pixelsBattery(int NEOPIXEL_BATTERY_NUMBER, int NEOPIXEL_BATTERY_PIN, NEO_GRB + NEO_KHZ800);`
   * `const int Neopixel_battery_pin;`
   * `const int Neopixel_battery_number;`
-  * `const int BATTERY_RED_THRESHOLD;`
-  * `const int BATTERY_YELLOW_THRESHOLD;`
   * `const int lights_pin;`
 
 ### Méthode
 
 * Publique
 
-  * `void toggleLights();`
+  * `void toggleLights(); allume ou ferme les lumières (cette fonction utilise l'intensité des lumières quand actif) | utilise la variable lights_power comme paramètre d'intensité`
   * `void write2LED(int pourcentage (entre 1 et 100));`
+  * `int updateBatteryLED(int batteryPercentage); // Fonction qui met à jour la couleur de la batterie et la valeur "battery_state" avec la valeur retournée`
 * Privé
 
   * `void setupLights();`
   * `static uint8_t percentToPWM(int percent); // est utilisé par write2LED`
-  * `int updateBatteryLED(int batteryPercentage); // Fonction qui met à jour la couleur de la batterie et la valeur "battery_state" avec la valeur retournée`
- 
 
 ## Robot
 
@@ -209,16 +228,17 @@ __Attribues__
 
 __Méthodes__
 * Publique :
-    * begin()
-    * stop()
-    * update()
+    * void initialisation()
+    * void stop()
+    * void update()
 * Privé :
-    * envoie_message_commande()
+    * envoie_message_commande(char command[])
     * reception_message_mannette()
-    * gererLumieres()
-    * gererMoteurs()
-    * gererAccelerometre()
-    * gererBatterie()
+    * void gererLumieres()
+    * void gererMoteurs()
+    * void gererAccelerometre()
+    * void gererBatterie()
+
 
 
 ## Message
