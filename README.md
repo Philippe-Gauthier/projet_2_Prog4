@@ -184,7 +184,7 @@ Public:
 
 * Publique
 
-  * `bool LED_STATE;`
+  * `bool LED_STATE; // variable utilisée pour la fonction togglelights`
   * `int Neopixel_brightness; // utilisé durant l'initialisation`
   * `int lights_power; // 0 à 100`
   * `int battery_state; // 0 à 3, int indicant le niveau de la batterie: (0: inconnue/erreur, 1: rouge, 2: jaune, 3: verte))`
@@ -194,15 +194,13 @@ Public:
   * `Adafruit_NeoPixel pixelsBattery(int NEOPIXEL_BATTERY_NUMBER, int NEOPIXEL_BATTERY_PIN, NEO_GRB + NEO_KHZ800);`
   * `const int Neopixel_battery_pin;`
   * `const int Neopixel_battery_number;`
-  * `const int BATTERY_RED_THRESHOLD;`
-  * `const int BATTERY_YELLOW_THRESHOLD;`
   * `const int lights_pin;`
 
 ### Méthode
 
 * Publique
 
-  * `void toggleLights();`
+  * `void toggleLights(); allume ou ferme les lumières (cette fonction utilise l'intensité des lumières quand actif) | utilise la variable lights_power comme paramètre d'intensité`
   * `void write2LED(int pourcentage (entre 1 et 100));`
   * `int updateBatteryLED(int batteryPercentage); // Fonction qui met à jour la couleur de la batterie et la valeur "battery_state" avec la valeur retournée`
 * Privé
