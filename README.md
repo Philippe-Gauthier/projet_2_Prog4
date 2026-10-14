@@ -214,6 +214,23 @@ __Méthodes__
     * gererMoteurs()
     * gererAccelerometre()
     * gererBatterie()
- 
+
+
+ ## Attributs
+**Public**:
+    * `char command[256]`
+    * `extern struct_message incomingMessage`
+    * `uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC}`
+    
+**Privé**:
+    * `struct_message`
+    * `longueur_message`
+
+## Méthodes
+**Public**:
+    * `void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len);`
+
+**Privé**:
+    * Aucun
 
 >>>>>>> Stashed changes
