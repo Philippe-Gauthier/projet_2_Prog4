@@ -195,12 +195,11 @@ Public:
 
   * `void toggleLights();`
   * `void write2LED(int pourcentage (entre 1 et 100));`
+  * `int updateBatteryLED(int batteryPercentage); // Fonction qui met à jour la couleur de la batterie et la valeur "battery_state" avec la valeur retournée`
 * Privé
 
   * `void setupLights();`
   * `static uint8_t percentToPWM(int percent); // est utilisé par write2LED`
-  * `int updateBatteryLED(int batteryPercentage); // Fonction qui met à jour la couleur de la batterie et la valeur "battery_state" avec la valeur retournée`
- 
 
 ## Robot
 
