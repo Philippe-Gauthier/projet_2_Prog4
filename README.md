@@ -96,6 +96,7 @@ envoie() : appelle encodage(), transmet le JSON à la classe Message et retourne
   - `int RIGHT_MOTOR_BWD` : Broche 45, marche arrière du moteur droit.
   - `int LEFT_MOTOR_FWD` : Broche 44, marche avant du moteur gauche.
   - `int LEFT_MOTOR_BWD` : Broche 42, marche arrière du moteur gauche.
+  - `bool tiltDetected` : Indique si la voiture est renversée (true) ou non (false).
 
 ## Méthodes
 
@@ -105,6 +106,7 @@ envoie() : appelle encodage(), transmet le JSON à la classe Message et retourne
   - `void rcCar_cmd(int x, int y)` : Calcule la vitesse et la direction des moteurs selon les valeurs du joystick.
     - `x` : Direction gauche/droite.
     - `y` : Déplacement avant/arrière.
+  -`void verifierInclinaison()` : Vérifie automatiquement si la voiture est renversée et arrête les moteurs avec rcCar_stop() si nécessaire.
 
 - **Privé :**
   - Aucune méthode.
@@ -184,27 +186,24 @@ Public:
 
 * Publique
 
-  * `bool LED_STATE;`
+  * `bool LED_STATE; // variable utilisée pour la fonction togglelights`
   * `int Neopixel_brightness; // utilisé durant l'initialisation`
   * `int lights_power; // 0 à 100`
-  * `int battery_state; // 0 à 3, int indicant le niveau de la batterie: (0: inconnue/erreur, 1: rouge, 2: jaune, 3: verte))`
 * Privé
 
   * `const int lights_pwm_channel = 0; // utilisé par write2LED`
   * `Adafruit_NeoPixel pixelsBattery(int NEOPIXEL_BATTERY_NUMBER, int NEOPIXEL_BATTERY_PIN, NEO_GRB + NEO_KHZ800);`
   * `const int Neopixel_battery_pin;`
   * `const int Neopixel_battery_number;`
-  * `const int BATTERY_RED_THRESHOLD;`
-  * `const int BATTERY_YELLOW_THRESHOLD;`
   * `const int lights_pin;`
 
 ### Méthode
 
 * Publique
 
-  * `void toggleLights();`
+  * `void toggleLights(); allume ou ferme les lumières (cette fonction utilise l'intensité des lumières quand actif) | utilise la variable lights_power comme paramètre d'intensité`
   * `void write2LED(int pourcentage (entre 1 et 100));`
-  * `int updateBatteryLED(int batteryPercentage); // Fonction qui met à jour la couleur de la batterie et la valeur "battery_state" avec la valeur retournée`
+  * `int updateBatteryLED(int batteryLED_level); // Fonction qui met à jour la couleur de la batterie et la valeur "battery_state" avec la valeur retournée`
 * Privé
 
   * `void setupLights();`
@@ -228,34 +227,41 @@ __Attribues__
 
 __Méthodes__
 * Publique :
-    * begin()
-    * stop()
-    * update()
+    * void initialisation()
+    * void stop()
+    * void update()
 * Privé :
-    * envoie_message_commande()
+    * envoie_message_commande(char command[])
     * reception_message_mannette()
-    * gererLumieres()
-    * gererMoteurs()
-    * gererAccelerometre()
-    * gererBatterie()
+    * void gererLumieres()
+    * void gererMoteurs()
+    * void gererAccelerometre()
+    * void gererBatterie()
+
 
 
 ## Message
+
 ### Attributs
 **Public**:
-    * `char command[256]`
-    * `extern struct_message incomingMessage`
-    * `uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC}`
+* `char command[256]`
+* `extern struct_message incomingMessage`
+* `uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC}`
     
 **Privé**:
-    * `struct_message`
-    * `longueur_message`
+* `longueur_message`
 
 ### Méthodes
 **Public**:
-    * `void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len);`
+* `esp_now_register_recv_cb(onDataRecv);`
 
 **Privé**:
-    * Aucun
+* `WiFi.mode(WIFI_STA);`
+* ```
+  if (esp_now_init() != ESP_OK) {
+            ESP.restart(); // Restart device if ESP-NOW fails
+            return;
+  }
+  ```
 
 
