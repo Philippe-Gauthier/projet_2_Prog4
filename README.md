@@ -250,7 +250,6 @@ __Méthodes__
 * `uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC}`
     
 **Privé**:
-* `struct_message`
 * `longueur_message`
 
 ### Méthodes
