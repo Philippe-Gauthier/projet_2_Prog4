@@ -27,6 +27,28 @@ class rccar_lights{
             }
         } // Write a specific brightness level to the lights (0-100%)
 
+        void updateBatteryLED(int batteryPercentage) {
+            if(batteryPercentage < BATTERY_RED_THRESHOLD) {
+                Serial.println("Battery low, setting LED to red");
+                pixelsBattery.fill(0xFF0000);         // Red = low battery warning
+                battery_state = 1;
+            } else if (batteryPercentage < BATTERY_YELLOW_THRESHOLD) {
+                Serial.println("Battery medium, setting LED to yellow");
+                pixelsBattery.fill(0xFFFF00);         // Yellow = medium battery
+                battery_state = 2;
+            } else if (batteryPercentage >= BATTERY_YELLOW_THRESHOLD) {
+                Serial.println("Battery good, setting LED to green");
+                pixelsBattery.fill(0x00FF00);         // Green = good battery
+                battery_state = 3;
+            } else {
+                Serial.println("Battery state unknown, setting LED to blue");
+                pixelsBattery.fill(0x0000FF);         // Blue = unknown/error
+                battery_state = 0;
+            }
+            pixelsBattery.show();
+            //return battery_state;
+        } // Update battery status LED color based on battery percentage
+
     private:
 
         // Variables
@@ -57,26 +79,4 @@ class rccar_lights{
             // Convert percentage (0-100) to PWM value (0-255)
             return map(percent, 0, 100, 0, 255);
         } // Convert percentage to PWM value
-
-        void updateBatteryLED(int batteryPercentage) {
-            if(batteryPercentage < BATTERY_RED_THRESHOLD) {
-                Serial.println("Battery low, setting LED to red");
-                pixelsBattery.fill(0xFF0000);         // Red = low battery warning
-                battery_state = 1;
-            } else if (batteryPercentage < BATTERY_YELLOW_THRESHOLD) {
-                Serial.println("Battery medium, setting LED to yellow");
-                pixelsBattery.fill(0xFFFF00);         // Yellow = medium battery
-                battery_state = 2;
-            } else if (batteryPercentage >= BATTERY_YELLOW_THRESHOLD) {
-                Serial.println("Battery good, setting LED to green");
-                pixelsBattery.fill(0x00FF00);         // Green = good battery
-                battery_state = 3;
-            } else {
-                Serial.println("Battery state unknown, setting LED to blue");
-                pixelsBattery.fill(0x0000FF);         // Blue = unknown/error
-                battery_state = 0;
-            }
-            pixelsBattery.show();
-            //return battery_state;
-        } // Update battery status LED color based on battery percentage
 }

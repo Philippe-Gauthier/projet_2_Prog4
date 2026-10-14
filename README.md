@@ -53,21 +53,26 @@ __Methodes__
 Rôle : Récupérer les données de la batterie et de l'accéléromètre, les encoder en JSON et les transmettre à la classe Message.
 
 ## Attributs
-| Nom | Type | Visibilité |
-|---|---|---|
-| `message` | `String` | Private |
-| `longueurMessage` | `size_t` | Private |
+Aucun (les attributs du message sont gérés par une autre classe).
 
 ## Méthodes
-| Nom | Retour | Paramètres | Visibilité |
-|---|---|---|---|
-| `encodage_json()` | `String` | `const String& donnees` | Public |
-| `envoie_message()` | `bool` | `const String& messageJson` | Public |
+
+Publique :
+envoie(const Donnees& donnees) : bool
+
+Privée :
+encodage(const Donnees& donnees) : String
 
 ## Relations
 - **Batterie → Information :** fournit les données de batterie.
 - **Accéléromètre → Information :** fournit les données d'inclinaison.
-- **Information → Message :** transmet le JSON préparé.
+
+## Fonctionnement
+
+encodage() : transforme les données d'une structure (struct) en JSON.
+envoie() : appelle encodage(), transmet le JSON à la classe Message et retourne un booléen indiquant si la demande d'envoi a réussi.
+
+
   
 # Moteur
 
