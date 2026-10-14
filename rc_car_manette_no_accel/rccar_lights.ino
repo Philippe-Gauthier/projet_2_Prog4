@@ -52,11 +52,9 @@ class rccar_lights{
     private:
 
         // Variables
-        ​const int lights_pwm_channel = 0; // utilisé par write2LED
+        ​const int lights_pwm_channel = 0; // utilisé par write2LED et toggleLights
         const ​​int Neopixel_battery_pin = 4;
         const ​int Neopixel_battery_number = 1;
-        const int BATTERY_RED_THRESHOLD = 20;
-        const int BATTERY_YELLOW_THRESHOLD = 50;
         const int lights_pin = 43; // Pin for controlling the lights (PWM output)
         ​Adafruit_NeoPixel pixelsBattery(Neopixel_battery_number, Neopixel_battery_pin, NEO_GRB + NEO_KHZ800);
 
