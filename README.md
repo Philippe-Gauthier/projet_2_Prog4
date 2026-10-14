@@ -1,8 +1,8 @@
 # projet_2_Prog4
 
-<<<<<<< Updated upstream
+
 ### batterie
-__Attribue__
+__Attribut__
 * Publique :
     * float tension
     * int pourcentage : (entre 0 et 100)
@@ -152,7 +152,7 @@ Public:
 ```
 
     
-=======
+
 ## Lumière
 
 ### Attributs
@@ -234,4 +234,4 @@ __Méthodes__
 **Privé**:
     * Aucun
 
->>>>>>> Stashed changes
+
