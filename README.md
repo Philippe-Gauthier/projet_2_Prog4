@@ -222,21 +222,28 @@ __Méthodes__
 
 
 ## Message
+
 ### Attributs
 **Public**:
-    * `char command[256]`
-    * `extern struct_message incomingMessage`
-    * `uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC}`
+* `char command[256]`
+* `extern struct_message incomingMessage`
+* `uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC}`
     
 **Privé**:
-    * `struct_message`
-    * `longueur_message`
+* `struct_message`
+* `longueur_message`
 
 ### Méthodes
 **Public**:
-    * `void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len);`
+* `esp_now_register_recv_cb(onDataRecv);`
 
 **Privé**:
-    * Aucun
+* `WiFi.mode(WIFI_STA);`
+* ```
+  if (esp_now_init() != ESP_OK) {
+            ESP.restart(); // Restart device if ESP-NOW fails
+            return;
+  }
+  ```
 
 
