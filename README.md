@@ -34,7 +34,12 @@ __Methodes__
 ## Attributs
 
 - **Public :**
-  - `char command[256]` : commande reçue
+- struct Commandes_Manettes
+   - jRX : int — axe horizontal du joystick
+   - jRY : int — axe vertical du joystick
+   - Se : bool — état du bouton SELECT
+   - U : bool — état du bouton U
+   - D : bool — état du bouton D
 
 - **Privé :**
   - Aucun
