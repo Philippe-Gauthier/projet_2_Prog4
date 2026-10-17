@@ -245,7 +245,6 @@ __Méthodes__
 
 ### Attributs
 **Public**:
-* `char command[256]`
 * `extern struct_message incomingMessage`
 * `uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC}`
     
