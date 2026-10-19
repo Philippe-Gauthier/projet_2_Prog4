@@ -245,22 +245,24 @@ __Méthodes__
 ### Attributs
 **Public**:
 * `extern struct_message incomingMessage`
-* `uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC}`
+* `uint8_t peerAddress[]`
     
 **Privé**:
 * `longueur_message`
+* `esp_now_peer_info_t peerInfo = {};`
+* `memcpy(peerInfo.peer_addr, peerAddress, 6);`
+* `peerInfo.channel = 0;`
+* `peerInfo.encrypt = false;`
+* `peerInfo.ifidx = WIFI_IF_STA;`
 
 ### Méthodes
 **Public**:
 * `esp_now_register_recv_cb(onDataRecv);`
 
 **Privé**:
-* `WiFi.mode(WIFI_STA);`
-* ```
-  if (esp_now_init() != ESP_OK) {
-            ESP.restart(); // Restart device if ESP-NOW fails
-            return;
-  }
-  ```
+* `void initialization_esp()`
+* `void initialization_serial_communication()`
+* `void maintenance_communication()`
+* `void peer_communication()`
 
 
