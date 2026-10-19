@@ -9,11 +9,11 @@ __Attribut__
     * int pin
     * int threshold_r
     * int threshold_j
-    * int max
-    * int min
-    * lumière led
+    * float max
+    * float min
+    * rccar_lights led
 * Privé :
-    * uint12_t valeur_raw
+    * int valeur_raw
     * int resolution
 
 __Methodes__
