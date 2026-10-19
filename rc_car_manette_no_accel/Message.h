@@ -3,12 +3,18 @@
 class message {
     public:
         struct_message incomingMessage;
-        uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC};
         esp_now_register_recv_cb(onDataRecv);
+        uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC};
+        esp_now_peer_info_t peerInfo = {};
+        memcpy(peerInfo.peer_addr, peerAddress, 6);
+        peerInfo.channel = 0;  
+        peerInfo.encrypt = false;
+        peerInfo.ifidx = WIFI_IF_STA; // Use station mode interface
     
     private:
         int longueur_message;
 
+        // Function that initializes the ESP-NOW to communicate with the ESP
         void initialization_esp(){
             // Initialize WiFi in station mode for ESP-NOW
             WiFi.mode(WIFI_STA);
@@ -29,6 +35,7 @@ class message {
             esp_now_register_recv_cb(onDataRecv);
         }
 
+        // Function that initializes the serial communication
         void initialization_serial_communication(){
             // Initialize serial communication (115200 baud)
             Serial.begin(115200);
@@ -38,5 +45,15 @@ class message {
             } else {
                 Serial.setDebugOutput(false);
             }
+        }
+
+        // Function that maintains the communication with the ESP
+        void maintenance_communication(){
+
+        }
+
+        // Function that maintains the communication with peer devices
+        void peer_communication(){
+
         }
 };
