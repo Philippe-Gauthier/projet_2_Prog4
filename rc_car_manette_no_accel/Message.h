@@ -11,7 +11,7 @@ class message {
         esp_now_peer_info_t peerInfo = {};
         peerInfo.channel = 0;  
         peerInfo.encrypt = false;
-        peerInfo.ifidx = WIFI_IF_STA; // Use station mode interface
+        peerInfo.ifidx = WIFI_IF_STA;
 
         // Function that initializes the ESP-NOW to communicate with the ESP
         void initialization_esp(){
@@ -23,8 +23,6 @@ class message {
             // Initialize ESP-NOW protocol
             if (esp_now_init() != ESP_OK) {
                 Serial.println("Error initializing ESP-NOW");
-                pixelsBattery.fill(0x0000FF); // Blue color indicates ESP-NOW error
-                pixelsBattery.show();
                 delay(2000);
                 ESP.restart(); // Restart device if ESP-NOW fails
                 return;
