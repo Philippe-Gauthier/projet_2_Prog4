@@ -3,9 +3,6 @@
 #include <Adafruit_NeoPixel.h>
 #include <Commande.h>
 
-#define BATTERY_RED_THRESHOLD    20
-#define BATTERY_YELLOW_THRESHOLD 50
-
 class rccar_lights : public Commande {
 public:
     int Neopixel_brightness = 255;
@@ -22,7 +19,6 @@ public:
         pixelsBattery.fill(0x0000FF);
         pixelsBattery.show();
     }
-    // inherit commande 
     
     void updateLED(){
         if(Se == 0 && Se_last == 1) {

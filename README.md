@@ -166,14 +166,13 @@ Cette structure regroupe les informations des deux capteurs.
 
 ## Attributs
 Private:
-* std::list<int> Donnée_Brute = [1, 2, 3]
-* int Threshold = 50
+* std::list<float> Donnée_Brute = [1.0, 2.0, 3.0]
+* float Threshold = 50.0
 * struct {
   float Accel_X;
   float Accel_Y;
   float Accel_Z;
 } Acceleration_data;
-* String Direction = " " // juste pour afficher dans le terminal, aucun effet sur les moteurs
   
 ## Méthodes
 Private:
@@ -184,8 +183,8 @@ void Accel_init() {
 ```
 
 ```
-  list<int> Get_values() { // lecture des registres
-    Value_list = [];
+  list<float> Get_values() { // lecture des registres
+    Value_list = [1.0, 2.0, 3.0];
     read all the registers;
     append into list;
     return Value_list;
@@ -207,23 +206,24 @@ void Accel_init() {
     else if (New_Acceleration < 0):
       New_direction = "Recule"
     this->Direction = New_direction;
+    print(message de test);
 }
 ```
 Public:
 ```
-  void Set_Threshold(int tilt) {
+  void Set_Threshold(float tilt) {
     this->Threshold = tilt;
     }
 ```
 ```
-  bool Error_check(int thresh, std::list<int> data) {
+// utilise la structure dans les attributs
+  bool Error_check(float thresh, Acceleration_data) {
     if (data[x] > thresh):
       return True
     else:
       return False
   }
 ```
-
     
 
 ## Lumière
@@ -232,9 +232,9 @@ Public:
 
 * Publique
 
-  * `bool LED_STATE; // variable utilisée pour la fonction togglelights`
-  * `int Neopixel_brightness; // utilisé durant l'initialisation`
+  * `int Neopixel_brightness; // Utilisé durant l'initialisation`
   * `int lights_power; // 0 à 100`
+  * `bool lights_on; // Variable déterminant l'état (on ou off) des lumières (phares).`
 * Privé
 
   * `const int lights_pwm_channel = 0; // utilisé par write2LED`
@@ -242,19 +242,20 @@ Public:
   * `const int Neopixel_battery_pin;`
   * `const int Neopixel_battery_number;`
   * `const int lights_pin;`
+  * `bool Se_last = Se; // Variable qui enregistre la valeur de Se (bouton select) au dernier cycle. Utilisé pour détection de front descendant.`
 
 ### Méthode
 
 * Publique
 
-  * `void toggleLights(); allume ou ferme les lumières (cette fonction utilise l'intensité des lumières quand actif) | utilise la variable lights_power comme paramètre d'intensité`
-  * `void write2LED(int pourcentage (entre 1 et 100));`
-  * `int updateBatteryLED(int batteryLED_level); // Fonction qui met à jour la couleur de la batterie et la valeur "battery_state" avec la valeur retournée`
+  * `void updateLED(); Regarde s'il y a un front montant sur la variable "Se", si oui; appel de la fonction toggleLights()`
+  * `int updateBatteryLED(int batteryLED_level); // Fonction qui met à jour la couleur de la batterie selon la valeur de batteryLED_level(2 = Rouge, 1 = Jaune et 0 = Vert)`
+  * `void setupLights(); | Initialisation`
 * Privé
 
-  * `void setupLights();`
-  * `static uint8_t percentToPWM(int percent); // est utilisé par write2LED`
-
+  * `static uint8_t percentToPWM(int percent); // est utilisé par write2LED | Convertit 0 à 255 en 0 à 100%`
+  * `void toggleLights(); Allume ou ferme les lumières selon l'état de la variable lights_on (si lights_on == false lors de l'appel de cette fonction, les lumières (phares) s'allument et lights_on = true et vice versa)`
+  
 ## Robot
 
 __Attribues__

@@ -1,8 +1,8 @@
 #include "Arduino.h"
-#include "Commande.h"
+#include "Information.h"
 
 
-class rccar_batterie {
+class rccar_batterie : public Information{
     public:
         float tension;
         int pourcentage;
@@ -56,4 +56,3 @@ class rccar_batterie {
             return voltage;
         }   
 };
-
