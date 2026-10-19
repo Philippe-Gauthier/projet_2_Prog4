@@ -1,12 +1,8 @@
-
-#include <stdint.h>
 #include "Arduino.h"
+#include "Commande.h"
 
-class lumiere{
-    public:
-        
-}
-class batterie {
+
+class rccar_batterie {
     public:
         float tension;
         int pourcentage;
@@ -15,16 +11,15 @@ class batterie {
         int threshold_j = 0;
         float max = 3.3;
         float min = 3.3;
-        lumiere led;
         void update_values(){
             tension = convert_raw();
             // Convert voltage to battery percentage using MIN_VOLTAGE and MAX_VOLTAGE
             pourcentage = (tension - min) / (max - min) * 100.0;
             if (pourcentage > 100) pourcentage = 100;
             if (pourcentage < 0) pourcentage = 0;
-
-            Serial.println(tension);
-            Serial.println(pourcentage);
+            batterie.tension = tension;
+            batterie.pourcentage = pourcentage;
+            envoie();
         };
         int get_threshold(){
             if(pourcentage < threshold_r) {
@@ -38,15 +33,9 @@ class batterie {
         };
         void updateBatteryLED(){
             int current_threshold = get_threshold();
-            if (current_threshold == 2){
-                Serial.println("Battery low, setting LED to red");
-            } else if (current_threshold == 2){
-                Serial.println("Battery medium, setting LED to yellow");
-            } else {
-                Serial.println("Battery good, setting LED to green");
-            };
+            return current_threshold
         };
-        batterie(int new_pin, float n_min, float n_max, int threshold1, int threshold2, lumiere light){
+        rccar_batterie(int new_pin, float n_min, float n_max, int threshold1, int threshold2){
             pin = new_pin;
             min = n_min;
             max = n_max;
@@ -56,7 +45,7 @@ class batterie {
             update_values();
         };
     private:
-        uint16_t valeur_raw = 2000;
+        int valeur_raw = 2000;
         int resolution = 12;
 
         float convert_raw() {
@@ -68,16 +57,3 @@ class batterie {
         }   
 };
 
-int PIN = A0;
-
-batterie bat(PIN, 0, 3.3 ,2 ,1 );
-
-void setup() {
-  Serial.begin(9600);
-  Serial.println(PIN);
-}
-void loop() {
-    bat.update_values();
-    bat.updateBatteryLED();
-    delay((1000));
-}
