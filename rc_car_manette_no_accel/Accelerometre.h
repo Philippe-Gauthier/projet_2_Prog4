@@ -3,13 +3,12 @@
 class Accelerometre : public Information{
     Private:
         std::list<float> Donnée_Brute = [1.0, 2.0, 3.0]
-        int Threshold = 50
+        float Threshold = 50.0;
         struct {
         float Accel_X;
         float Accel_Y;
         float Accel_Z;
         } Acceleration_data;
-        String Direction = " " // juste pour afficher dans le terminal, aucun effet sur les moteurs
 
     Private:
 
@@ -46,12 +45,12 @@ class Accelerometre : public Information{
 
         Public:
 
-        void Set_Threshold(int tilt) {
+        void Set_Threshold(float tilt) {
             this->Threshold = tilt;
             print("Threshold set to: " + String(Threshold));
             }
 
-        bool Error_check(int thresh, Acceleration_data) {
+        bool Error_check(float thresh, Acceleration_data) {
             //update_values(Get_values()); // remet les valeurs à jour pour la prochaine vérification
             if (Acceleration_data.Accel_X > thresh):
                 // Herité de son parent :information, on peut donc utiliser les méthodes de la classe Information
