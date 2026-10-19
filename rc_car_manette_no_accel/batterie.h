@@ -22,6 +22,7 @@ class rccar_batterie : public Information{
             envoie();
         };
         int get_threshold(){
+            //Get the threshold. Its either 0,1,2
             if(pourcentage < threshold_r) {
                 return 2;
             } else if (pourcentage < threshold_j) {
@@ -31,10 +32,7 @@ class rccar_batterie : public Information{
             }
 
         };
-        void updateBatteryLED(){
-            int current_threshold = get_threshold();
-            return current_threshold
-        };
+
         rccar_batterie(int new_pin,  int threshold1, int threshold2){
             pin = new_pin;
             threshold_r = threshold1;
