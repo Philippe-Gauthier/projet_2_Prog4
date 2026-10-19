@@ -166,14 +166,13 @@ Cette structure regroupe les informations des deux capteurs.
 
 ## Attributs
 Private:
-* std::list<int> Donnée_Brute = [1, 2, 3]
-* int Threshold = 50
+* std::list<float> Donnée_Brute = [1.0, 2.0, 3.0]
+* float Threshold = 50.0
 * struct {
   float Accel_X;
   float Accel_Y;
   float Accel_Z;
 } Acceleration_data;
-* String Direction = " " // juste pour afficher dans le terminal, aucun effet sur les moteurs
   
 ## Méthodes
 Private:
@@ -184,8 +183,8 @@ void Accel_init() {
 ```
 
 ```
-  list<int> Get_values() { // lecture des registres
-    Value_list = [];
+  list<float> Get_values() { // lecture des registres
+    Value_list = [1.0, 2.0, 3.0];
     read all the registers;
     append into list;
     return Value_list;
@@ -207,23 +206,24 @@ void Accel_init() {
     else if (New_Acceleration < 0):
       New_direction = "Recule"
     this->Direction = New_direction;
+    print(message de test);
 }
 ```
 Public:
 ```
-  void Set_Threshold(int tilt) {
+  void Set_Threshold(float tilt) {
     this->Threshold = tilt;
     }
 ```
 ```
-  bool Error_check(int thresh, std::list<int> data) {
+// utilise la structure dans les attributs
+  bool Error_check(float thresh, Acceleration_data) {
     if (data[x] > thresh):
       return True
     else:
       return False
   }
 ```
-
     
 
 ## Lumière
