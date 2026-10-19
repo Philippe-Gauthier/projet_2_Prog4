@@ -40,9 +40,19 @@ struct Donnees
 
 class Information
 {
+public:
+
+    // ===== ATTRIBUTS PUBLICS =====
+
+    // Modifie par la classe Batterie
+    DonneesBatterie batterie;
+
+    // Modifie par la classe Accelerometre
+    DonneesAccelerometre accelerometre;
+
 private:
 
-    // Convertit toutes les donnees en JSON
+    // Convertit la structure complete en JSON
     String encodage(const Donnees& donnees)
     {
         JsonDocument doc;
@@ -67,13 +77,19 @@ private:
 
 public:
 
-    // Encode les donnees et prepare leur envoi
-    bool envoie(const Donnees& donnees)
+    // Regroupe les attributs et prepare le JSON
+    bool envoie()
     {
-        // Appel de la methode privee
+        // Creation de la structure principale
+        Donnees donnees;
+
+        // Recuperation des attributs
+        donnees.batterie = batterie;
+        donnees.accelerometre = accelerometre;
+
+        // Encodage des donnees en JSON
         String json = encodage(donnees);
 
-        // Verification du JSON
         if (json.length() == 0)
         {
             return false;
@@ -82,11 +98,11 @@ public:
         // Affichage pour les tests
         Serial.println(json);
 
-        // Appeler la methode d'envoi
-        // de la classe Message (ESP-NOW).
+        // envoyer le JSON avec
+        // la classe Message (ESP-NOW).
 
-        // Pour l'instant true signifie
-        // seulement que le JSON a ete cree.
+        // Pour l'instant true indique
+        // uniquement que le JSON est genere.
         return true;
     }
 };
