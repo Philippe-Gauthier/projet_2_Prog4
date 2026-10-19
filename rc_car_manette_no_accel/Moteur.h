@@ -2,11 +2,13 @@
 #ifndef MOTEUR_H
 #define MOTEUR_H
 
+#include "Commande.h"
 #include <Arduino.h>
 #include "driver/mcpwm.h"
 
 // Classe qui controle les deux moteurs de la voiture.
-class Moteur {
+// Elle herite de la classe Commande.
+class Moteur : public Commande {
 
 private:
     // Puissance et direction des moteurs (-100 a 100).
@@ -88,7 +90,7 @@ public:
         duty_cycle_right = (y - adjusted_x * weight) * turn_factor;
         duty_cycle_left = (y + adjusted_x * weight) * turn_factor;
 
-S        // Limiter la puissance entre -100 et 100.
+        // Limiter la puissance entre -100 et 100.
         duty_cycle_right = constrain(duty_cycle_right, -100, 100);
         duty_cycle_left = constrain(duty_cycle_left, -100, 100);
 
@@ -116,4 +118,4 @@ S        // Limiter la puissance entre -100 et 100.
     }
 };
 
-#endif
+#endif // MOTEUR_H
