@@ -11,7 +11,6 @@ __Attribut__
     * int threshold_j
     * float max
     * float min
-    * rccar_lights led
 * Privé :
     * int valeur_raw
     * int resolution
@@ -20,7 +19,7 @@ __Methodes__
 * Publique :
     * update_values() : void 
     * get_threshold() : int (0 | 1 | 2)
-    * rccar_(int new_pin, float n_min, float n_max, int threshold1, int threshold2) : void
+    * rccar_batterie(int new_pin, float n_min, float n_max, int threshold1, int threshold2) : void
     * updateBatteryLED(): void
 * Privé :
     * convert_raw() : float
