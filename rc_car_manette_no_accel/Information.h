@@ -1,36 +1,64 @@
+
 #ifndef INFORMATION_H
 #define INFORMATION_H
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-// Structure contenant les données des capteurs
+// ==========================================
+// STRUCTURE DES DONNEES DE LA BATTERIE
+// ==========================================
+
+struct DonneesBatterie
+{
+    float tension = 0;
+    int pourcentage = 0;
+};
+
+// ==========================================
+// STRUCTURE DES DONNEES DE L'ACCELEROMETRE
+// ==========================================
+
+struct DonneesAccelerometre
+{
+    bool state = false;
+};
+
+// ==========================================
+// STRUCTURE PRINCIPALE
+// ==========================================
+
 struct Donnees
 {
-    float tension;
-    int pourcentage;
-
-    float Accel_X;
-    float Accel_Y;
-    float Accel_Z;
+    DonneesBatterie batterie;
+    DonneesAccelerometre accelerometre;
 };
+
+// ==========================================
+// CLASSE INFORMATION
+// ==========================================
 
 class Information
 {
 private:
 
-    // Convertir la structure en JSON.
+    // Convertit toutes les donnees en JSON
     String encodage(const Donnees& donnees)
     {
         JsonDocument doc;
 
-        doc["tension"] = donnees.tension;
-        doc["pourcentage"] = donnees.pourcentage;
+        // Donnees de la batterie
+        doc["batterie"]["tension"] =
+            donnees.batterie.tension;
 
-        doc["Accel_X"] = donnees.Accel_X;
-        doc["Accel_Y"] = donnees.Accel_Y;
-        doc["Accel_Z"] = donnees.Accel_Z;
+        doc["batterie"]["pourcentage"] =
+            donnees.batterie.pourcentage;
 
+        // Etat de l'accelerometre
+        doc["accelerometre"]["state"] =
+            donnees.accelerometre.state;
+
+        // Creation du JSON
         String json;
         serializeJson(doc, json);
 
@@ -39,19 +67,26 @@ private:
 
 public:
 
-    // Encoder les données et préparer leur envoi
+    // Encode les donnees et prepare leur envoi
     bool envoie(const Donnees& donnees)
     {
+        // Appel de la methode privee
         String json = encodage(donnees);
 
+        // Verification du JSON
         if (json.length() == 0)
         {
             return false;
         }
 
-        // Envoi à intégrer avec la classe Message
+        // Affichage pour les tests
         Serial.println(json);
 
+        // Appeler la methode d'envoi
+        // de la classe Message (ESP-NOW).
+
+        // Pour l'instant true signifie
+        // seulement que le JSON a ete cree.
         return true;
     }
 };
