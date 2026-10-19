@@ -4,9 +4,9 @@
 class Robot
 {
 private:
-    controleurMoteurs moteurs;
-    controleurLumieres lumieres;
-    moniteurBatterie batterie;
+    Moteur moteurs;
+    rccar_lights lumieres;
+    rccar_batterie batterie;
     Accelerometre accelerometre;
 
     bool robotActif = true;
