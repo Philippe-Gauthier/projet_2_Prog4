@@ -1,3 +1,4 @@
+
 /*
  * Fichier      : Information.h
  * Classe       : Information
@@ -17,32 +18,14 @@
 #include "Message.h"
 
 // ==========================================
-// STRUCTURE DES DONNEES DE LA BATTERIE
-// ==========================================
-
-struct DonneesBatterie
-{
-    float tension = 0;
-    int pourcentage = 0;
-};
-
-// ==========================================
-// STRUCTURE DES DONNEES DE L'ACCELEROMETRE
-// ==========================================
-
-struct DonneesAccelerometre
-{
-    bool state = false;
-};
-
-// ==========================================
 // STRUCTURE PRINCIPALE
 // ==========================================
 
 struct Donnees
 {
-    DonneesBatterie batterie;
-    DonneesAccelerometre accelerometre;
+    float tension = 0;
+    int pourcentage = 0;
+    bool state = false;
 };
 
 // ==========================================
@@ -54,10 +37,10 @@ class Information : public message
 public:
 
     // Attribut modifie par la batterie
-    DonneesBatterie batterie;
+    Donnees batterie;
 
     // Attribut modifie par l'accelerometre
-    DonneesAccelerometre accelerometre;
+    Donnees accelerometre;
 
 private:
 
@@ -76,14 +59,14 @@ private:
 
         // Donnees de la batterie
         doc["batterie"]["tension"] =
-            donnees.batterie.tension;
+            donnees.tension;
 
         doc["batterie"]["pourcentage"] =
-            donnees.batterie.pourcentage;
+            donnees.pourcentage;
 
         // Etat de l'accelerometre
         doc["accelerometre"]["state"] =
-            donnees.accelerometre.state;
+            donnees.state;
 
         // Creation du JSON
         String json;
@@ -109,8 +92,9 @@ public:
         // Regroupement des attributs
         Donnees donnees;
 
-        donnees.batterie = batterie;
-        donnees.accelerometre = accelerometre;
+        donnees.tension = batterie.tension;
+        donnees.pourcentage = batterie.pourcentage;
+        donnees.state = accelerometre.state;
 
         // Encodage en JSON
         String json = encodage(donnees);
