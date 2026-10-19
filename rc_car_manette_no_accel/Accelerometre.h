@@ -1,4 +1,5 @@
 #include "Arduino.h"
+#include "Information.h"
 
 class Accelerometre : public Information{
     Private:
