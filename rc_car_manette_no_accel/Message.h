@@ -9,7 +9,6 @@ class message {
     private:
         int longueur_message;
         esp_now_peer_info_t peerInfo = {};
-        memcpy(peerInfo.peer_addr, peerAddress, 6);
         peerInfo.channel = 0;  
         peerInfo.encrypt = false;
         peerInfo.ifidx = WIFI_IF_STA; // Use station mode interface
@@ -47,13 +46,8 @@ class message {
             }
         }
 
-        // Function that maintains the communication with the ESP
+        // Function that maintains the communication
         void maintenance_communication(){
-
-        }
-
-        // Function that maintains the communication with peer devices
-        void peer_communication(){
 
         }
 };
