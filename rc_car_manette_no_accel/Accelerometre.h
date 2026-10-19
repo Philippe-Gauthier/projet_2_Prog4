@@ -51,7 +51,10 @@ class Accelerometre : public Information{
             print("Threshold set to: " + String(Threshold));
             }
 
-        bool Error_check(int thresh, std::list<int> data) {
+        bool Error_check(int thresh, std::list<float> Acceleration_data) {
+            // Herité de son parent :information, on peut donc utiliser les méthodes de la classe Information
+            accelerometre.state = True;
+            Envoie();
             /*if (data[x] > thresh):
             return True
             else:
