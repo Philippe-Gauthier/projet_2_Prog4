@@ -1,7 +1,7 @@
 # projet_2_Prog4
 
 
-### batterie
+### rccar_batterie
 __Attribut__
 * Publique :
     * float tension
@@ -20,7 +20,7 @@ __Methodes__
 * Publique :
     * update_values() : void 
     * get_threshold() : int (0 | 1 | 2)
-    * init() : void
+    * rccar_(int new_pin, float n_min, float n_max, int threshold1, int threshold2) : void
     * updateBatteryLED(): void
 * Privé :
     * convert_raw() : float
