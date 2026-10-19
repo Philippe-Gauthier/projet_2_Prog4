@@ -260,9 +260,9 @@ __Attribues__
     * 
 
 * Privé : 
-    * controleurMoteurs moteurs;
-    * controleurLumieres lumieres;
-    * moniteurBatterie batterie;
+    * Moteur moteurs;
+    * rccar_lights lumieres;
+    * rccar_batterie batterie;
     * Accelerometre accelerometre;
     * bool robotActif;
     * bool tiltDetecte;
@@ -274,8 +274,6 @@ __Méthodes__
     * void stop()
     * void update()
 * Privé :
-    * envoie_message_commande(char command[])
-    * reception_message_mannette()
     * void gererLumieres()
     * void gererMoteurs()
     * void gererAccelerometre()
