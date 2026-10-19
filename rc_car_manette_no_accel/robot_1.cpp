@@ -60,5 +60,10 @@ void Robot::gererBatterie()
 
 void Robot::gererAccelerometre()
 {
-    accelerometre.Error_check();
+    if(accelerometre.Error_check())
+    {
+        tiltDetected = true;
+        robotActif = false;
+        return;
+    }
 }
