@@ -1,9 +1,9 @@
-
 #include "Robot.h"
 #include "batterie.h"
 #include "Accelerometre.h"
 #include "Moteur.h"
 #include "rccar_lights.h"
+#include "Commande.h"
 
 
 void Robot::initialisation()
@@ -20,9 +20,9 @@ void Robot::initialisation()
 void Robot::update()
 {
     gererAccelerometre();
+    gererBatterie();
     gererLumieres();
     gererMoteurs();
-    gererBatterie();
 }
 
 
@@ -41,25 +41,24 @@ void Robot::gererMoteurs()
         return;
     }
 
-    moteurs.rcCar_cmd(x, y);
+    moteurs.rcCar_cmd();
 }
 
 
 void Robot::gererLumieres()
 {
-    lumieres.updateBatteryLED();
-    lumieres.toggleLights();
+    lumieres.updateBatteryLED(batterie.get_threshold());
+    lumieres.updateLED();
 }
 
 
 void Robot::gererBatterie()
 {
     batterie.update_values();
-
 }
 
 
 void Robot::gererAccelerometre()
 {
-    accelerometre.update_values();
+    accelerometre.Error_check();
 }
