@@ -40,7 +40,7 @@ class Accelerometre : public Information{
             New_direction = "Recule"
             this->Direction = New_direction;*/
 
-            print("Acceleration X: " + "Acceleration_data.Accel_X" + " Acceleration Y: " + "Acceleration_data.Accel_Y" + " Acceleration Z: " + "Acceleration_data.Accel_Z" + " Direction: " + "Direction");
+            print("Acceleration X: " + String(Acceleration_data.Accel_X) + " Acceleration Y: " + String(Acceleration_data.Accel_Y) + " Acceleration Z: " + String(Acceleration_data.Accel_Z) + " Direction: " + Direction);
             }
         }
 
@@ -51,14 +51,21 @@ class Accelerometre : public Information{
             print("Threshold set to: " + String(Threshold));
             }
 
-        bool Error_check(int thresh, std::list<float> Acceleration_data) {
-            // Herité de son parent :information, on peut donc utiliser les méthodes de la classe Information
-            accelerometre.state = True;
-            Envoie();
-            /*if (data[x] > thresh):
-            return True
+        bool Error_check(int thresh, Acceleration_data) {
+            //update_values(Get_values()); // remet les valeurs à jour pour la prochaine vérification
+            if (Acceleration_data.Accel_X > thresh):
+                // Herité de son parent :information, on peut donc utiliser les méthodes de la classe Information
+                accelerometre.state = True;
+                Envoie();
+            else if (Acceleration_data.Accel_Y > thresh):
+                accelerometre.state = True;
+                Envoie();
+            else if (Acceleration_data.Accel_Z > thresh):
+                accelerometre.state = True;
+                Envoie();
             else:
-            return False*/
+                accelerometre.state = False;
+                Envoie();
             return True; // juste pour l'exemple, normalement on va faire la vérification
             }
         }

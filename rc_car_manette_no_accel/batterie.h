@@ -33,13 +33,7 @@ class rccar_batterie {
         };
         void updateBatteryLED(){
             int current_threshold = get_threshold();
-            if (current_threshold == 2){
-                Serial.println("Battery low, setting LED to red");
-            } else if (current_threshold == 1){
-                Serial.println("Battery medium, setting LED to yellow");
-            } else {
-                Serial.println("Battery good, setting LED to green");
-            };
+            return current_threshold
         };
         rccar_batterie(int new_pin, float n_min, float n_max, int threshold1, int threshold2){
             pin = new_pin;

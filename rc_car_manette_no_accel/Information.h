@@ -1,9 +1,20 @@
+/*
+ * Fichier      : Information.h
+ * Classe       : Information
+ * Auteurs      : Said Tarzalt
+ * Description  : Recupere les donnees de la batterie et
+ *                de l'accelerometre, les regroupe dans
+ *                une structure, les convertit en JSON
+ *                et les envoie avec ESP-NOW.
+ */
 
 #ifndef INFORMATION_H
 #define INFORMATION_H
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <esp_now.h>
+#include "Message.h"
 
 // ==========================================
 // STRUCTURE DES DONNEES DE LA BATTERIE
@@ -38,21 +49,27 @@ struct Donnees
 // CLASSE INFORMATION
 // ==========================================
 
-class Information
+class Information : public message
 {
 public:
 
-    // ===== ATTRIBUTS PUBLICS =====
-
-    // Modifie par la classe Batterie
+    // Attribut modifie par la batterie
     DonneesBatterie batterie;
 
-    // Modifie par la classe Accelerometre
+    // Attribut modifie par l'accelerometre
     DonneesAccelerometre accelerometre;
 
 private:
 
-    // Convertit la structure complete en JSON
+/*
+* Fonction   : encodage
+* Description: Convertit les donnees de la batterie
+*              et de l'accelerometre en un seul JSON.
+* Parametre  : donnees - Structure contenant les
+*              informations des deux capteurs.
+* Retour     : String contenant le JSON genere.
+*/
+
     String encodage(const Donnees& donnees)
     {
         JsonDocument doc;
@@ -77,33 +94,44 @@ private:
 
 public:
 
-    // Regroupe les attributs et prepare le JSON
+/*
+* Fonction   : envoie
+* Description: Regroupe les informations des deux
+*              capteurs, les encode en JSON et
+*              demande leur envoi avec ESP-NOW.
+* Parametre  : Aucun.
+* Retour     : true si ESP-NOW accepte la demande
+*              d'envoi, false sinon.
+*/
+
     bool envoie()
     {
-        // Creation de la structure principale
+        // Regroupement des attributs
         Donnees donnees;
 
-        // Recuperation des attributs
         donnees.batterie = batterie;
         donnees.accelerometre = accelerometre;
 
-        // Encodage des donnees en JSON
+        // Encodage en JSON
         String json = encodage(donnees);
 
+        // Verification du JSON
         if (json.length() == 0)
-        {
-            return false;
-        }
+            {
+                return false;
+            }
 
         // Affichage pour les tests
         Serial.println(json);
 
-        // envoyer le JSON avec
-        // la classe Message (ESP-NOW).
+        // Envoi avec l'adresse MAC heritee
+        esp_err_t resultat = esp_now_send(
+            peerAddress,
+            reinterpret_cast<const uint8_t*>(json.c_str()),
+            json.length()
+        );
 
-        // Pour l'instant true indique
-        // uniquement que le JSON est genere.
-        return true;
+        return resultat == ESP_OK;
     }
 };
 
