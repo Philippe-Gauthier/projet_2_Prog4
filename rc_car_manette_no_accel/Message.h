@@ -5,14 +5,14 @@ class message {
         struct_message incomingMessage;
         esp_now_register_recv_cb(onDataRecv);
         uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC};
+    
+    private:
+        int longueur_message;
         esp_now_peer_info_t peerInfo = {};
         memcpy(peerInfo.peer_addr, peerAddress, 6);
         peerInfo.channel = 0;  
         peerInfo.encrypt = false;
         peerInfo.ifidx = WIFI_IF_STA; // Use station mode interface
-    
-    private:
-        int longueur_message;
 
         // Function that initializes the ESP-NOW to communicate with the ESP
         void initialization_esp(){
