@@ -52,29 +52,79 @@ __Methodes__
 - **Privé :**
   - Aucun
   
-### Information
+## Classe Information
 
-Rôle : Récupérer les données de la batterie et de l'accéléromètre, les encoder en JSON et les transmettre à la classe Message.
+### Rôle
 
-## Attributs
-Aucun (les attributs du message sont gérés par une autre classe).
+La classe `Information` récupère les données de la batterie et l'état de l'accéléromètre, les regroupe dans une structure `Donnees`, les convertit en un seul message JSON et déclenche son envoi.
 
-## Méthodes
+La classe `Information` hérite de la classe `message`.
 
-Publique :
-envoie(const Donnees& donnees) : bool
+### Attributs
 
-Privée :
-encodage(const Donnees& donnees) : String
+| Attribut | Type | Visibilité | Description |
+|---|---|---|---|
+| `batterie` | `DonneesBatterie` | Public | Contient la tension et le pourcentage de la batterie. |
+| `accelerometre` | `DonneesAccelerometre` | Public | Contient l'état d'erreur de l'accéléromètre. |
 
-## Relations
-- **Batterie → Information :** fournit les données de batterie.
-- **Accéléromètre → Information :** fournit les données d'inclinaison.
+### Structures utilisées
 
-## Fonctionnement
+**DonneesBatterie**
+- `tension` : `float` — Tension de la batterie.
+- `pourcentage` : `int` — Pourcentage de la batterie.
 
-encodage() : transforme les données d'une structure (struct) en JSON.
-envoie() : appelle encodage(), transmet le JSON à la classe Message et retourne un booléen indiquant si la demande d'envoi a réussi.
+**DonneesAccelerometre**
+- `state` : `bool` — État d'erreur de l'accéléromètre (`true` = erreur, `false` = aucune erreur).
+
+**Donnees**
+- `batterie` : `DonneesBatterie`
+- `accelerometre` : `DonneesAccelerometre`
+
+Cette structure regroupe les informations des deux capteurs.
+
+### Méthodes
+
+**Publique : `envoie() : bool`**
+
+- Récupère les valeurs des attributs `batterie` et `accelerometre`.
+- Regroupe les valeurs dans la structure `Donnees`.
+- Appelle la méthode privée `encodage()`.
+- Demande l'envoi du JSON.
+- Retourne `true` si la demande d'envoi est acceptée, sinon `false`.
+
+**Privée : `encodage(const Donnees& donnees) : String`**
+
+- Reçoit une structure `Donnees`.
+- Convertit les informations de la batterie et de l'accéléromètre en JSON.
+- Retourne le JSON sous forme de `String`.
+
+### Relations
+
+- **Batterie → Information** : écrit la tension et le pourcentage dans l'attribut `batterie`.
+- **Accéléromètre → Information** : écrit son état d'erreur dans l'attribut `accelerometre`.
+- **Information → message** : hérite de la classe `message` et utilise l'adresse MAC héritée pour demander l'envoi du JSON.
+
+### Fonctionnement
+
+1. La classe Batterie met à jour l'attribut `batterie`.
+2. La classe Accéléromètre met à jour l'attribut `accelerometre`.
+3. La méthode `envoie()` regroupe les attributs dans la structure `Donnees`.
+4. La méthode `encodage()` transforme cette structure en un seul JSON.
+5. La méthode `envoie()` demande la transmission du JSON.
+
+### Exemple de JSON
+
+```json
+{
+  "batterie": {
+    "tension": 3.9,
+    "pourcentage": 80
+  },
+  "accelerometre": {
+    "state": false
+  }
+}
+```
 
 
   
@@ -109,9 +159,6 @@ envoie() : appelle encodage(), transmet le JSON à la classe Message et retourne
 
 - **Privé :**
   - Aucune méthode.
-
-
-  # projet_2_Prog4
 
 
 ## Jérémy : Accéléromètre
