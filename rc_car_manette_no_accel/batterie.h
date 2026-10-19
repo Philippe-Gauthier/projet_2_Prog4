@@ -6,9 +6,9 @@ class rccar_batterie : public Information{
     public:
         float tension;
         int pourcentage;
-        int pin;
-        int threshold_r = 0;
-        int threshold_j = 0;
+        int pin = 1;
+        int threshold_r = 20;
+        int threshold_j = 50;
         float max = 3.3;
         float min = 3.3;
         void update_values(){
@@ -35,10 +35,8 @@ class rccar_batterie : public Information{
             int current_threshold = get_threshold();
             return current_threshold
         };
-        rccar_batterie(int new_pin, float n_min, float n_max, int threshold1, int threshold2){
+        rccar_batterie(int new_pin,  int threshold1, int threshold2){
             pin = new_pin;
-            min = n_min;
-            max = n_max;
             threshold_r = threshold1;
             threshold_j = threshold2;
             led= light;
