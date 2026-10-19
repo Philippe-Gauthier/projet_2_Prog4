@@ -1,3 +1,6 @@
+#ifndef ROBOT_H
+#define ROBOT_H
+
 class Robot
 {
 private:
@@ -18,3 +21,5 @@ public:
     void update();
     void stop();
 };
+
+#endif
