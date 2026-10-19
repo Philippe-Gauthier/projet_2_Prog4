@@ -64,30 +64,27 @@ La classe `Information` hérite de la classe `message`.
 
 | Attribut | Type | Visibilité | Description |
 |---|---|---|---|
-| `batterie` | `DonneesBatterie` | Public | Contient la tension et le pourcentage de la batterie. |
-| `accelerometre` | `DonneesAccelerometre` | Public | Contient l'état d'erreur de l'accéléromètre. |
+| `batterie` | `Donnees` | Public | Contient les informations de la batterie : tension et pourcentage. |
+| `accelerometre` | `Donnees` | Public | Contient l'état d'erreur de l'accéléromètre. |
 
-### Structures utilisées
-
-**DonneesBatterie**
-- `tension` : `float` — Tension de la batterie.
-- `pourcentage` : `int` — Pourcentage de la batterie.
-
-**DonneesAccelerometre**
-- `state` : `bool` — État d'erreur de l'accéléromètre (`true` = erreur, `false` = aucune erreur).
+### Structure utilisée
 
 **Donnees**
-- `batterie` : `DonneesBatterie`
-- `accelerometre` : `DonneesAccelerometre`
 
-Cette structure regroupe les informations des deux capteurs.
+| Champ | Type | Description |
+|---|---|---|
+| `tension` | `float` | Tension de la batterie. |
+| `pourcentage` | `int` | Pourcentage de la batterie. |
+| `state` | `bool` | État d'erreur de l'accéléromètre (`true` = erreur, `false` = aucune erreur). |
+
+Les deux attributs publics `batterie` et `accelerometre` utilisent la même structure `Donnees`. Chaque attribut contient les trois champs, mais chaque collègue modifie uniquement les informations qui le concernent.
 
 ### Méthodes
 
 **Publique : `envoie() : bool`**
 
 - Récupère les valeurs des attributs `batterie` et `accelerometre`.
-- Regroupe les valeurs dans la structure `Donnees`.
+- Regroupe les valeurs utiles dans une variable de type `Donnees`.
 - Appelle la méthode privée `encodage()`.
 - Demande l'envoi du JSON.
 - Retourne `true` si la demande d'envoi est acceptée, sinon `false`.
@@ -108,7 +105,7 @@ Cette structure regroupe les informations des deux capteurs.
 
 1. La classe Batterie met à jour l'attribut `batterie`.
 2. La classe Accéléromètre met à jour l'attribut `accelerometre`.
-3. La méthode `envoie()` regroupe les attributs dans la structure `Donnees`.
+3. La méthode `envoie()` regroupe les valeurs utiles dans la structure `Donnees`.
 4. La méthode `encodage()` transforme cette structure en un seul JSON.
 5. La méthode `envoie()` demande la transmission du JSON.
 
