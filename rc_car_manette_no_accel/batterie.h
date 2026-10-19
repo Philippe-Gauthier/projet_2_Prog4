@@ -49,7 +49,6 @@ class rccar_batterie : public Information{
         int resolution = 12;
 
         float convert_raw() {
-            Serial.println("-------------- Reading battery voltage --------------");
             float max_adc = (float)((1 << resolution) - 1);
             valeur_raw = analogRead(pin);
             float voltage = valeur_raw / max_adc * max + min;
