@@ -1,10 +1,3 @@
-#include "Robot.h"
-#include "batterie.h"
-#include "Accelerometre.h"
-#include "Moteur.h"
-#include "rccar_lights.h"
-#include "Commande.h"
-
 
 void Robot::initialisation()
 {
