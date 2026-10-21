@@ -41,7 +41,7 @@ void Robot::gererMoteurs()
         return;
     }
 
-    moteurs.rcCar_cmd();
+    moteurs.rcCar_cmd(robot.Commande.decoding_JSON());
 }
 
 
