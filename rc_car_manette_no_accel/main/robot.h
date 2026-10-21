@@ -1,6 +1,12 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
+#include "batterie.h"
+#include "Accelerometre.h"
+#include "Moteur.h"
+#include "rccar_lights.h"
+#include "Commande.h"
+
 class Robot
 {
 private:
