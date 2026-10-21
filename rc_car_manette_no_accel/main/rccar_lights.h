@@ -10,9 +10,9 @@ public:
     bool lights_on = false;
     
     void setupLights() {
-        ledcSetup(lights_pwm_channel, 5000, 8);
-        ledcAttachPin(lights_pin, lights_pwm_channel);
-        ledcWrite(lights_pwm_channel, 0);
+        ledcAttach(lights_pin, 5000, 8);
+
+        ledcWrite(lights_pin, 0);
         
         pixelsBattery.begin();
         pixelsBattery.setBrightness(Neopixel_brightness);
@@ -21,10 +21,10 @@ public:
     }
     
     void updateLED(){
-        if(Se == 0 && Se_last == 1) {
+        if(manettes.Se == 0 && Se_last == 1) {
             toggleLights();            
         }
-        Se_last = Se;
+        Se_last = manettes.Se;
     } // Checks for level change 
     
     void updateBatteryLED(int batteryLED_level) {
@@ -40,7 +40,7 @@ public:
         } else {
             Serial.println("Battery state unknown, setting LED to blue");
             pixelsBattery.fill(0x0000FF);         // Blue = unknown/error
-            battery_state = 0;
+
         }
         pixelsBattery.show();
     } // Update battery status LED color based on battery percentage
@@ -50,7 +50,7 @@ public:
     const int Neopixel_battery_pin = 4;
     const int Neopixel_battery_number = 1;
     const int lights_pin = 43;
-    bool Se_last = Se;
+    bool Se_last = manettes.Se;
     Adafruit_NeoPixel pixelsBattery{Neopixel_battery_number, Neopixel_battery_pin, NEO_GRB + NEO_KHZ800};
     
     int percentToPWM(int percent) {
@@ -59,10 +59,10 @@ public:
     
     void toggleLights(){
         if(lights_on) {
-            ledcWrite(lights_pwm_channel, 0);
+            ledcWrite(lights_pin, 0);
             lights_on = false;
         } else {
-            ledcWrite(lights_pwm_channel, percentToPWM(lights_power));
+            ledcWrite(lights_pin, percentToPWM(lights_power));
             lights_on = true;
         }
     } // Toggle the lights on/off
