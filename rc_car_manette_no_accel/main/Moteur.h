@@ -20,11 +20,6 @@ private:
     int adjusted_x = 0;
     float weight = 0.5;
 
-    // Broches des moteurs.
-    const int RIGHT_MOTOR_FWD = 2;
-    const int RIGHT_MOTOR_BWD = 45;
-    const int LEFT_MOTOR_FWD = 44;
-    const int LEFT_MOTOR_BWD = 42;
 
     // Indique si la voiture est renversee.
     bool tiltDetected = false;
