@@ -24,7 +24,7 @@ class Accelerometre : public Information{
             float value_list[3] = {};
             //read all the registers;
             //append into list;
-            return Value_list;
+            return value_list;
             };
 
         // Modifier pour prendre conpte de la nouvelle structure
@@ -63,11 +63,11 @@ class Accelerometre : public Information{
             else if (Acceleration_data.Accel_Y > thresh){
                 accelerometre.state = true;
                 envoie();
-            };
+            }
             else if (Acceleration_data.Accel_Z > thresh){
                 accelerometre.state = true;
                 envoie();
-            };
+            }
             else{
                 accelerometre.state = false;
                 envoie();
