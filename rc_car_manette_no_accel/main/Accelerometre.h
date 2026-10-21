@@ -74,4 +74,6 @@ class Accelerometre : public Information{
             };
             return true; // juste pour l'exemple, normalement on va faire la vérification
         };
+    };
+
 
