@@ -3,7 +3,7 @@
 
 class Accelerometre : public Information{
     Private:
-        std::list<float> Donnée_Brute = [1.0, 2.0, 3.0]
+        float Donnee_Brute[3] = {0.0, 0.0, 0.0}; // juste pour l'exemple, normalement on va lire les registres;
         float Threshold = 50.0;
         struct {
         float Accel_X;
@@ -11,15 +11,13 @@ class Accelerometre : public Information{
         float Accel_Z;
         } Acceleration_data;
 
-    Private:
-
         void Accel_init() {
         // demarrage ligne I2C et mise au point des registres au besoin
-            print("Accelerometre initialisé");
+            serial.print("Accelerometre initialisé");
         }
 
-        list<float> Get_values() { // lecture des registres
-            Value_list = [1.0, 2.0, 3.0] // juste pour l'exemple, normalement on va lire les registres;
+        float* Get_values() { // lecture des registres
+            float value_list[3] = {};
             //read all the registers;
             //append into list;
             return Value_list;
@@ -40,33 +38,36 @@ class Accelerometre : public Information{
             New_direction = "Recule"
             this->Direction = New_direction;*/
 
-            print("Acceleration X: " + String(Acceleration_data.Accel_X) + " Acceleration Y: " + String(Acceleration_data.Accel_Y) + " Acceleration Z: " + String(Acceleration_data.Accel_Z) + " Direction: " + Direction);
+            serial.print("Acceleration X: " + String(Acceleration_data.Accel_X) + " Acceleration Y: " + String(Acceleration_data.Accel_Y) + " Acceleration Z: " + String(Acceleration_data.Accel_Z) + " Direction: " + Direction);
             }
         }
 
-        Public:
+    Public:
 
         void Set_Threshold(float tilt) {
             this->Threshold = tilt;
-            print("Threshold set to: " + String(Threshold));
+            serial.print("Threshold set to: " + String(Threshold));
             }
 
         bool Error_check(float thresh, Acceleration_data) {
             //update_values(Get_values()); // remet les valeurs à jour pour la prochaine vérification
-            if (Acceleration_data.Accel_X > thresh):
+            if (Acceleration_data.Accel_X > thresh){
                 // Herité de son parent :information, on peut donc utiliser les méthodes de la classe Information
                 accelerometre.state = True;
                 Envoie();
-            else if (Acceleration_data.Accel_Y > thresh):
+            }
+            else if (Acceleration_data.Accel_Y > thresh){
                 accelerometre.state = True;
                 Envoie();
-            else if (Acceleration_data.Accel_Z > thresh):
+            }
+            else if (Acceleration_data.Accel_Z > thresh){
                 accelerometre.state = True;
                 Envoie();
-            else:
+            }
+            else{
                 accelerometre.state = False;
                 Envoie();
-            return True; // juste pour l'exemple, normalement on va faire la vérification
             }
+            return True; // juste pour l'exemple, normalement on va faire la vérification
         }
 
