@@ -45,7 +45,6 @@ class Accelerometre : public Information{
 
             Serial.print("Acceleration X: " + String(Acceleration_data.Accel_X) + " Acceleration Y: " + String(Acceleration_data.Accel_Y) + " Acceleration Z: " + String(Acceleration_data.Accel_Z));
             };
-        };
 
     public:
 
