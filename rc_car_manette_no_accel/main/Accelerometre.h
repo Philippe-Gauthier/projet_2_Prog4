@@ -51,19 +51,22 @@ class Accelerometre : public Information{
 
         bool Error_check(float thresh, Acceleration_data) {
             //update_values(Get_values()); // remet les valeurs à jour pour la prochaine vérification
-            if (Acceleration_data.Accel_X > thresh):
+            if (Acceleration_data.Accel_X > thresh){
                 // Herité de son parent :information, on peut donc utiliser les méthodes de la classe Information
                 accelerometre.state = True;
                 Envoie();
-            else if (Acceleration_data.Accel_Y > thresh):
+            }
+            else if (Acceleration_data.Accel_Y > thresh){
                 accelerometre.state = True;
                 Envoie();
-            else if (Acceleration_data.Accel_Z > thresh):
+            }
+            else if (Acceleration_data.Accel_Z > thresh){
                 accelerometre.state = True;
                 Envoie();
-            else:
+            else{
                 accelerometre.state = False;
                 Envoie();
+            }
             return True; // juste pour l'exemple, normalement on va faire la vérification
             }
         }
