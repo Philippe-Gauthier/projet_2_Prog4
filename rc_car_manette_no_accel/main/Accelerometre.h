@@ -15,11 +15,6 @@ class Accelerometre : public Information{
         float Threshold = 50.0;
         BMI_data Acceleration_data = {0.0, 0.0, 0.0};
 
-        void Accel_init() {
-        // demarrage ligne I2C et mise au point des registres au besoin
-            Serial.print("Accelerometre initialisé");
-        };
-
         float* Get_values() { // lecture des registres
             float value_list[3] = {};
             //read all the registers;
@@ -47,6 +42,11 @@ class Accelerometre : public Information{
             };
 
     public:
+
+        void Accel_init() {
+        // demarrage ligne I2C et mise au point des registres au besoin
+            Serial.print("Accelerometre initialisé");
+        };
 
         void Set_Threshold(float tilt) {
             this->Threshold = tilt;
