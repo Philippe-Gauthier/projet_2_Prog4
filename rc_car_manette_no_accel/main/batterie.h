@@ -33,10 +33,7 @@ class rccar_batterie : public Information{
 
         };
 
-        rccar_batterie(int new_pin,  int threshold1, int threshold2){
-            pin = new_pin;
-            threshold_r = threshold1;
-            threshold_j = threshold2;
+        void init(){
             update_values();
         };
     private:
