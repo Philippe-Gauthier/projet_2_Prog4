@@ -11,8 +11,6 @@ class Accelerometre : public Information{
         float Accel_Z;
         } Acceleration_data;
 
-    Private:
-
         void Accel_init() {
         // demarrage ligne I2C et mise au point des registres au besoin
             print("Accelerometre initialisé");
@@ -44,7 +42,7 @@ class Accelerometre : public Information{
             }
         }
 
-        Public:
+    Public:
 
         void Set_Threshold(float tilt) {
             this->Threshold = tilt;
