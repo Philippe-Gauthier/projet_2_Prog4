@@ -22,9 +22,9 @@ void setup() {
   }
 
 
-  Robot.initialisation(onDataRecv);
+  robot.initialisation(onDataRecv);
 }
 
 void loop() {
-  Robot.update();
+  robot.update();
 }
