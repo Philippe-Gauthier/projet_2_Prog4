@@ -3,7 +3,7 @@
 
 class Accelerometre : public Information{
     Private:
-        std::list<float> Donnée_Brute = [1.0, 2.0, 3.0]
+        float Donnee_Brute[3] = {0.0, 0.0, 0.0}; // juste pour l'exemple, normalement on va lire les registres;
         float Threshold = 50.0;
         struct {
         float Accel_X;
@@ -13,11 +13,11 @@ class Accelerometre : public Information{
 
         void Accel_init() {
         // demarrage ligne I2C et mise au point des registres au besoin
-            print("Accelerometre initialisé");
+            serial.print("Accelerometre initialisé");
         }
 
-        list<float> Get_values() { // lecture des registres
-            Value_list = [1.0, 2.0, 3.0] // juste pour l'exemple, normalement on va lire les registres;
+        float* Get_values() { // lecture des registres
+            float value_list[3] = {};
             //read all the registers;
             //append into list;
             return Value_list;
@@ -38,7 +38,7 @@ class Accelerometre : public Information{
             New_direction = "Recule"
             this->Direction = New_direction;*/
 
-            print("Acceleration X: " + String(Acceleration_data.Accel_X) + " Acceleration Y: " + String(Acceleration_data.Accel_Y) + " Acceleration Z: " + String(Acceleration_data.Accel_Z) + " Direction: " + Direction);
+            serial.print("Acceleration X: " + String(Acceleration_data.Accel_X) + " Acceleration Y: " + String(Acceleration_data.Accel_Y) + " Acceleration Z: " + String(Acceleration_data.Accel_Z) + " Direction: " + Direction);
             }
         }
 
@@ -46,7 +46,7 @@ class Accelerometre : public Information{
 
         void Set_Threshold(float tilt) {
             this->Threshold = tilt;
-            print("Threshold set to: " + String(Threshold));
+            serial.print("Threshold set to: " + String(Threshold));
             }
 
         bool Error_check(float thresh, Acceleration_data) {
