@@ -2,7 +2,7 @@
 #include "Information.h"
 
 class Accelerometre : public Information{
-    Private:
+    private:
         float Donnee_Brute[3] = {0.0, 0.0, 0.0}; // juste pour l'exemple, normalement on va lire les registres;
         float Threshold = 50.0;
         struct {
@@ -24,7 +24,8 @@ class Accelerometre : public Information{
             }
 
         // Modifier pour prendre conpte de la nouvelle structure
-        void update_values(Get_values, ) { // Met les attributs à jour
+        void update_values() { // Met les attributs à jour
+            float* Raw_values = Get_values();
             /*this->Données_Brute = list;
             New_Acceleration_X = calcul pour faire la conversion
             New_Acceleration_Y = calcul pour faire la conversion
@@ -38,11 +39,11 @@ class Accelerometre : public Information{
             New_direction = "Recule"
             this->Direction = New_direction;*/
 
-            serial.print("Acceleration X: " + String(Acceleration_data.Accel_X) + " Acceleration Y: " + String(Acceleration_data.Accel_Y) + " Acceleration Z: " + String(Acceleration_data.Accel_Z) + " Direction: " + Direction);
+            serial.print("Acceleration X: " + String(Acceleration_data.Accel_X) + " Acceleration Y: " + String(Acceleration_data.Accel_Y) + " Acceleration Z: " + String(Acceleration_data.Accel_Z));
             }
         }
 
-    Public:
+    public:
 
         void Set_Threshold(float tilt) {
             this->Threshold = tilt;
@@ -53,21 +54,21 @@ class Accelerometre : public Information{
             //update_values(Get_values()); // remet les valeurs à jour pour la prochaine vérification
             if (Acceleration_data.Accel_X > thresh){
                 // Herité de son parent :information, on peut donc utiliser les méthodes de la classe Information
-                accelerometre.state = True;
-                Envoie();
+                accelerometre.state = true;
+                envoie();
             }
             else if (Acceleration_data.Accel_Y > thresh){
-                accelerometre.state = True;
-                Envoie();
+                accelerometre.state = true;
+                envoie();
             }
             else if (Acceleration_data.Accel_Z > thresh){
-                accelerometre.state = True;
-                Envoie();
+                accelerometre.state = true;
+                envoie();
             }
             else{
-                accelerometre.state = False;
-                Envoie();
+                accelerometre.state = false;
+                envoie();
             }
-            return True; // juste pour l'exemple, normalement on va faire la vérification
+            return true; // juste pour l'exemple, normalement on va faire la vérification
         }
 
