@@ -63,11 +63,11 @@ class Accelerometre : public Information{
             else if (Acceleration_data.Accel_Z > thresh){
                 accelerometre.state = True;
                 Envoie();
+            }
             else{
                 accelerometre.state = False;
                 Envoie();
             }
             return True; // juste pour l'exemple, normalement on va faire la vérification
-            }
         }
 
