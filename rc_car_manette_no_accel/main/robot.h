@@ -27,7 +27,7 @@ public:
     void update();
     void stop();
     void reception_commande(const uint8_t *incomingData, int len) {
-    lumieres.update(incomingData, len);
+    lumieres.updateLED(incomingData, len);
     Moteur.update(incomingData, len);
   }
 };
