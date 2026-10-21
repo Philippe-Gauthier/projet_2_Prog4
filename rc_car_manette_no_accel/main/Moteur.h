@@ -1,9 +1,9 @@
-
 #ifndef MOTEUR_H
 #define MOTEUR_H
 
 #include "Commande.h"
 #include <Arduino.h>
+#include "user_define.h"
 #include "driver/mcpwm.h"
 
 // Classe qui controle les deux moteurs de la voiture.
@@ -67,6 +67,9 @@ public:
     // Controle les moteurs avec le joystick.
     void rcCar_cmd(int x, int y) {
 
+          // Limiter les valeurs du joystick.
+        x = constrain(x, -100, 100);
+        y = constrain(y, -100, 100);
         // Arret si la voiture est renversee.
         if (tiltDetected) {
             rcCar_stop();
@@ -107,6 +110,10 @@ public:
                        max(0, duty_cycle_left));
     }
 
+  // Utilise les valeurs du joystick heritees de Commande.
+    void appliquerCommande() {
+        rcCar_cmd(manettes.jRX, manettes.jRY);
+    }
     // Arrete les moteurs si la voiture se renverse.
     void verifierInclinaison(bool estRenverse) {
 
