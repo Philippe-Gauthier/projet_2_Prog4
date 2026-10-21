@@ -37,7 +37,6 @@ class rccar_batterie : public Information{
             pin = new_pin;
             threshold_r = threshold1;
             threshold_j = threshold2;
-            led= light;
             update_values();
         };
     private:
