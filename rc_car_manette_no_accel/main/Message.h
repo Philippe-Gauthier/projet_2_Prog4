@@ -4,7 +4,7 @@ class message {
     public:
         struct_message incomingMessage;
         esp_now_register_recv_cb(onDataRecv);
-        uint8_t peerAddress[] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC};
+        uint8_t peerAddress[6] = {0xDC, 0x54, 0x75, 0xC0, 0x83, 0xCC};
     
     private:
         int longueur_message;
