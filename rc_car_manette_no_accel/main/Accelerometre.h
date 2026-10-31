@@ -53,20 +53,13 @@ class Accelerometre : public Information{
             Serial.print("Threshold set to: " + String(Threshold));
             };
 
-        bool Error_check(float thresh, Acceleration_data) {
+        bool Error_check(float thresh, const BMI_data& Acceleration_data) {
             //update_values(Get_values()); // remet les valeurs à jour pour la prochaine vérification
-            if (Acceleration_data.Accel_X > thresh){
-                // Herité de son parent :information, on peut donc utiliser les méthodes de la classe Information
+            if (Acceleration_data.Accel_X > Threshold ||
+                Acceleration_data.Accel_Y > Threshold ||
+                Acceleration_data.Accel_Z > Threshold) 
+                {
                 accelerometre.state = true;
-                envoie();
-            }
-            else if (Acceleration_data.Accel_Y > thresh){
-                accelerometre.state = true;
-                envoie();
-            }
-            else if (Acceleration_data.Accel_Z > thresh){
-                accelerometre.state = true;
-                envoie();
             }
             else{
                 accelerometre.state = false;
