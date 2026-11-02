@@ -67,5 +67,5 @@ void Robot::gererAccelerometre()
 void Robot::reception_commande(const uint8_t *incomingData, int len)
 {
     lumieres.Commande.reception_Message(incomingData, len);
-    Moteurs.Commande.reception_Message(incomingData, len);
+    moteurs.Commande.reception_Message(incomingData, len);
 }
