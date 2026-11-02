@@ -19,7 +19,7 @@ struct Commandes_Manettes
 
 //  CLASSE COMMANDE 
 
-class Commande
+class Commande  : public message
 {
     public:
          Commandes_Manettes manettes;
@@ -32,20 +32,21 @@ class Commande
 
 inline String Commande::reception_Message(const uint8_t *incomingData,int len)
 {
-    char buffer[256];
+    
 
     // Vérification de la longueur des données reçues
-    if (incomingData == nullptr || len <= 0 || len >= sizeof(buffer))
+    if (incomingData == nullptr || len <= 0 || len >= sizeof(incomingMessage.data))
     {
         Serial.println("Error: Incoming data too large or invalid!");
         return "";
     }
 
     // Copie des données dans un tampon temporaire
-    memcpy(buffer, incomingData, len);
-    buffer[len] = '\0';
+    incomingMessage.len = len;
+    memcpy(incomingMessage.data, incomingData, incomingMessage.len);
+    incomingMessage.data[incomingMessage.len] = '\0';
 
-    return String(buffer);
+    return String(incomingMessage.data);
 }
 
 //  DECODAGE JSON       

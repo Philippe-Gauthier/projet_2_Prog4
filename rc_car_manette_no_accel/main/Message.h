@@ -4,7 +4,7 @@
 
 struct struct_message
 {
-    uint8_t data[256];
+    char data[256];
     int len;
 
 };
