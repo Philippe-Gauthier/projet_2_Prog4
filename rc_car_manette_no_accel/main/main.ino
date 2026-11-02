@@ -4,7 +4,7 @@
 #include "user_define.h"
 #include "robot.h"
 
-robot robot;
+Robot robot;
 
 void onDataRecv(const esp_now_recv_info_t *info, const uint8_t *incomingData, int len) {
   robot.reception_commande(incomingData, len);
