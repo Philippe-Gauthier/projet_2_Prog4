@@ -1,13 +1,12 @@
 #ifndef MOTEUR_H
 #define MOTEUR_H
 
-#include "Commande.h"
 #include <Arduino.h>
+#include "Commande.h"
 #include "user_define.h"
 #include "driver/mcpwm.h"
 
 // Classe qui controle les deux moteurs de la voiture.
-// Elle herite de la classe Commande.
 class Moteur : public Commande {
 
 private:
@@ -20,6 +19,7 @@ private:
     int adjusted_x = 0;
     float weight = 0.5;
 
+    // Les broches sont deja definies dans user_define.h.
 
     // Indique si la voiture est renversee.
     bool tiltDetected = false;
@@ -29,7 +29,6 @@ public:
     // Initialise les moteurs et le PWM.
     void rcCar_setup() {
 
-        // Associer les broches aux moteurs.
         mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, RIGHT_MOTOR_FWD);
         mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, RIGHT_MOTOR_BWD);
         mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1A, LEFT_MOTOR_FWD);
@@ -62,9 +61,10 @@ public:
     // Controle les moteurs avec le joystick.
     void rcCar_cmd(int x, int y) {
 
-          // Limiter les valeurs du joystick.
+        // Limiter les valeurs du joystick.
         x = constrain(x, -100, 100);
         y = constrain(y, -100, 100);
+
         // Arret si la voiture est renversee.
         if (tiltDetected) {
             rcCar_stop();
@@ -105,10 +105,11 @@ public:
                        max(0, duty_cycle_left));
     }
 
-  // Utilise les valeurs du joystick heritees de Commande.
+    // Utilise les valeurs du joystick heritees de Commande.
     void appliquerCommande() {
         rcCar_cmd(manettes.jRX, manettes.jRY);
     }
+
     // Arrete les moteurs si la voiture se renverse.
     void verifierInclinaison(bool estRenverse) {
 

@@ -16,6 +16,7 @@ private:
     Accelerometre accelerometre;
 
     bool robotActif = true;
+    bool tiltDetected = false;
 
     void gererMoteurs();
     void gererLumieres();
@@ -26,10 +27,7 @@ public:
     void initialisation();
     void update();
     void stop();
-    void reception_commande(const uint8_t *incomingData, int len) {
-    lumieres.updateLED(incomingData, len);
-    moteurs.update(incomingData, len);
-  }
+    void reception_commande(const uint8_t *incomingData, int len);
 };
 
 #endif
