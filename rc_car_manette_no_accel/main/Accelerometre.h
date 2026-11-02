@@ -53,7 +53,7 @@ class Accelerometre : public Information{
             Serial.print("Threshold set to: " + String(Threshold));
             };
 
-        bool Error_check(float thresh, const BMI_data& Acceleration_data) {
+        bool Error_check() {
             //update_values(Get_values()); // remet les valeurs à jour pour la prochaine vérification
             if (Acceleration_data.Accel_X > Threshold ||
                 Acceleration_data.Accel_Y > Threshold ||
