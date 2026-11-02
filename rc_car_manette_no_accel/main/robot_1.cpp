@@ -62,6 +62,7 @@ void Robot::gererAccelerometre()
         robotActif = false;
         return;
     }
+    robotActif = true;
 }
 
 
