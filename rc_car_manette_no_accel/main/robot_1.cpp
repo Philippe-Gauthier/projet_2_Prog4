@@ -62,3 +62,10 @@ void Robot::gererAccelerometre()
         return;
     }
 }
+
+
+void Robot::reception_commande(const uint8_t *incomingData, int len)
+{
+    lumieres.Commande.reception_Message(incomingData, len);
+    Moteurs.Commande.reception_Message(incomingData, len);
+}
