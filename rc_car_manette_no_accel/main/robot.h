@@ -16,6 +16,7 @@ private:
     Accelerometre accelerometre;
 
     bool robotActif = true;
+    bool tiltDetected = false;
 
     void gererMoteurs();
     void gererLumieres();
