@@ -60,6 +60,7 @@ class Accelerometre : public Information{
                 Acceleration_data.Accel_Z > Threshold) 
                 {
                 accelerometre.state = true;
+                envoie();
             }
             else{
                 accelerometre.state = false;
