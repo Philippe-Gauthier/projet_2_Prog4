@@ -24,7 +24,7 @@ private:
     void gererAccelerometre();
 
 public:
-    void initialisation();
+    void initialisation(void (*onDataRecv)(const esp_now_recv_info_t *, const uint8_t *, int ));
     void update();
     void stop();
     void reception_commande(const uint8_t *incomingData, int len);

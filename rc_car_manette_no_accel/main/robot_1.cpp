@@ -1,7 +1,8 @@
 #include "robot.h"
 
-void Robot::initialisation()
+void Robot::initialisation(void (*onDataRecv)(const esp_now_recv_info_t *, const uint8_t *, int ))
 {
+    accelerometre.initialization_esp(onDataRecv);
     moteurs.rcCar_setup();
     lumieres.setupLights();
     batterie.init();
@@ -35,7 +36,7 @@ void Robot::gererMoteurs()
         return;
     }
 
-    moteurs.rcCar_cmd(Commande.decoding_JSON());
+    moteurs.rcCar_cmd();
     
 }
 
@@ -66,6 +67,6 @@ void Robot::gererAccelerometre()
 
 void Robot::reception_commande(const uint8_t *incomingData, int len)
 {
-    lumieres.Commande.reception_Message(incomingData, len);
-    moteurs.Commande.reception_Message(incomingData, len);
+    lumieres.reception_Message(incomingData, len);
+    moteurs.reception_Message(incomingData, len);
 }

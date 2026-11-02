@@ -30,7 +30,7 @@ class Commande
 
 //  RECEPTION DU MESSAGE 
 
-String Commande::reception_Message(const uint8_t *incomingData,int len)
+inline String Commande::reception_Message(const uint8_t *incomingData,int len)
 {
     char buffer[256];
 
@@ -50,7 +50,7 @@ String Commande::reception_Message(const uint8_t *incomingData,int len)
 
 //  DECODAGE JSON       
 
-void Commande::decoding_JSON(String message)
+inline void Commande::decoding_JSON(String message)
 {
     JsonDocument doc;
 

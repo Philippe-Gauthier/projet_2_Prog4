@@ -59,8 +59,9 @@ public:
     }
 
     // Controle les moteurs avec le joystick.
-    void rcCar_cmd(int x, int y) {
-
+    void rcCar_cmd() {
+        int x = manettes.jRX;
+        int y = manettes.jRY;
         // Limiter les valeurs du joystick.
         x = constrain(x, -100, 100);
         y = constrain(y, -100, 100);
@@ -107,7 +108,7 @@ public:
 
     // Utilise les valeurs du joystick heritees de Commande.
     void appliquerCommande() {
-        rcCar_cmd(manettes.jRX, manettes.jRY);
+        rcCar_cmd();
     }
 
     // Arrete les moteurs si la voiture se renverse.
