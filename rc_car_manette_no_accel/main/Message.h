@@ -40,11 +40,6 @@ class message {
     private:
         esp_now_peer_info_t peerInfo = {};
         // Function that initializes the ESP-NOW to communicate with the ESP
-        
-        // Function that maintains the communication
-        void maintenance_communication(){
-
-        }
 };
 
 #endif
