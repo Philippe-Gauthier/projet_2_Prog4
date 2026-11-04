@@ -254,7 +254,7 @@ Public:
   
 ## Robot
 
-__Attribues__
+__Attributs__
 * Publique :
 
     * 
