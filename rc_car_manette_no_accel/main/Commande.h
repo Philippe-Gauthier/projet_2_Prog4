@@ -1,3 +1,4 @@
+
 #ifndef COMMANDE_H
 #define COMMANDE_H
 
@@ -5,7 +6,9 @@
 #include <ArduinoJson.h>
 #include <cstring>
 
-//  STRUCTURE DES MANETTES 
+#include "message.h"  
+
+// STRUCTURE DES MANETTES 
 
 struct Commandes_Manettes
 {
@@ -17,9 +20,9 @@ struct Commandes_Manettes
     bool D = false;   // Bouton D
 };
 
-//  CLASSE COMMANDE 
+// CLASSE COMMANDE 
 
-class Commande  : public message
+class Commande : public message  
 {
     public:
          Commandes_Manettes manettes;
@@ -28,12 +31,10 @@ class Commande  : public message
          void decoding_JSON(String message);
 };
 
-//  RECEPTION DU MESSAGE 
+// RECEPTION DU MESSAGE 
 
 inline String Commande::reception_Message(const uint8_t *incomingData,int len)
 {
-    
-
     // Vérification de la longueur des données reçues
     if (incomingData == nullptr || len <= 0 || len >= sizeof(incomingMessage.data))
     {
@@ -41,7 +42,7 @@ inline String Commande::reception_Message(const uint8_t *incomingData,int len)
         return "";
     }
 
-    // Copie des données dans un tampon temporaire
+    // Copie des données dans le tampon de l'objet message
     incomingMessage.len = len;
     memcpy(incomingMessage.data, incomingData, incomingMessage.len);
     incomingMessage.data[incomingMessage.len] = '\0';
@@ -49,7 +50,7 @@ inline String Commande::reception_Message(const uint8_t *incomingData,int len)
     return String(incomingMessage.data);
 }
 
-//  DECODAGE JSON       
+// DECODAGE JSON       
 
 inline void Commande::decoding_JSON(String message)
 {
@@ -70,7 +71,7 @@ inline void Commande::decoding_JSON(String message)
     {
         const char* key = kv.key().c_str();
 
-        //  LECTURE DES BOUTONS 
+        // LECTURE DES BOUTONS 
 
         if (kv.value().is<bool>())
         {
