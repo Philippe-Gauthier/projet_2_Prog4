@@ -1,3 +1,6 @@
+#ifndef MESSAGE_H
+#define MESSAGE_H
+
 #include <WiFi.h>
 #include <esp_now.h>
 #include <user_define.h>
@@ -43,3 +46,5 @@ class message {
 
         }
 };
+
+#endif
