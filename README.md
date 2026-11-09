@@ -1,27 +1,29 @@
 # projet_2_Prog4
 
-
 ### rccar_batterie
+
 __Attribut__
+
 * Publique :
-    * float tension
-    * int pourcentage : (entre 0 et 100)
-    * int pin
-    * int threshold_r
-    * int threshold_j
-    * float max
-    * float min
+  * float tension
+  * int pourcentage : (entre 0 et 100)
+  * int pin
+  * int threshold_r
+  * int threshold_j
+  * float max
+  * float min
 * Privé :
-    * int valeur_raw
-    * int resolution
+  * int valeur_raw
+  * int resolution
 
 __Methodes__
+
 * Publique :
-    * update_values() : void 
-    * get_threshold() : int (0 | 1 | 2)
-    * rccar_batterie(int new_pin, float n_min, float n_max, int threshold1, int threshold2) : void
+  * update_values() : void
+  * get_threshold() : int (0 | 1 | 2)
+  * rccar_batterie(int new_pin, float n_min, float n_max, int threshold1, int threshold2) : void
 * Privé :
-    * convert_raw() : float
+  * convert_raw() : float
 
 ### Commande
 
@@ -33,24 +35,26 @@ __Methodes__
 
 - **Public :**
 - struct Commandes_Manettes
-   - jRX : int — axe horizontal du joystick
-   - jRY : int — axe vertical du joystick
-   - Se : bool — état du bouton SELECT
-   - U : bool — état du bouton U
-   - D : bool — état du bouton D
 
+  - jRX : int — axe horizontal du joystick
+  - jRY : int — axe vertical du joystick
+  - Se : bool — état du bouton SELECT
+  - U : bool — état du bouton U
+  - D : bool — état du bouton D
 - **Privé :**
+
   - Aucun
 
 ## Méthodes
 
 - **Public :**
+
   - `reception_Message(const uint8_t *incomingData, int len) : String`
   - `decoding_JSON(String message) : void`
-
 - **Privé :**
+
   - Aucun
-  
+
 ## Classe Information
 
 ### Rôle
@@ -61,20 +65,20 @@ La classe `Information` hérite de la classe `message`.
 
 ### Attributs
 
-| Attribut | Type | Visibilité | Description |
-|---|---|---|---|
-| `batterie` | `Donnees` | Public | Contient les informations de la batterie : tension et pourcentage. |
-| `accelerometre` | `Donnees` | Public | Contient l'état d'erreur de l'accéléromètre. |
+| Attribut          | Type        | Visibilité | Description                                                        |
+| ----------------- | ----------- | ----------- | ------------------------------------------------------------------ |
+| `batterie`      | `Donnees` | Public      | Contient les informations de la batterie : tension et pourcentage. |
+| `accelerometre` | `Donnees` | Public      | Contient l'état d'erreur de l'accéléromètre.                   |
 
 ### Structure utilisée
 
 **Donnees**
 
-| Champ | Type | Description |
-|---|---|---|
-| `tension` | `float` | Tension de la batterie. |
-| `pourcentage` | `int` | Pourcentage de la batterie. |
-| `state` | `bool` | État d'erreur de l'accéléromètre (`true` = erreur, `false` = aucune erreur). |
+| Champ           | Type      | Description                                                                          |
+| --------------- | --------- | ------------------------------------------------------------------------------------ |
+| `tension`     | `float` | Tension de la batterie.                                                              |
+| `pourcentage` | `int`   | Pourcentage de la batterie.                                                          |
+| `state`       | `bool`  | État d'erreur de l'accéléromètre (`true` = erreur, `false` = aucune erreur). |
 
 Les deux attributs publics `batterie` et `accelerometre` utilisent la même structure `Donnees`. Chaque attribut contient les trois champs, mais chaque collègue modifie uniquement les informations qui le concernent.
 
@@ -122,16 +126,15 @@ Les deux attributs publics `batterie` et `accelerometre` utilisent la même stru
 }
 ```
 
-
-  
 # Moteur
 
 ## Attributs
 
 - **Public :**
-  - Aucun
 
+  - Aucun
 - **Privé :**
+
   - `int duty_cycle_right` : Puissance et sens du moteur droit (entre -100 et 100).
   - `int duty_cycle_left` : Puissance et sens du moteur gauche (entre -100 et 100).
   - `float turn_factor` : Facteur de réduction de vitesse lors des virages (entre 0,9 et 1,0).
@@ -146,32 +149,37 @@ Les deux attributs publics `batterie` et `accelerometre` utilisent la même stru
 ## Méthodes
 
 - **Public :**
+
   - `void rcCar_setup()` : Initialise les broches et le PWM des moteurs, ainsi que les phares et le NeoPixel.
   - `void rcCar_stop()` : Arrête les deux moteurs en mettant les quatre sorties PWM à 0.
   - `void rcCar_cmd(int x, int y)` : Calcule la vitesse et la direction des moteurs selon les valeurs du joystick.
     - `x` : Direction gauche/droite.
     - `y` : Déplacement avant/arrière.
-  -`void verifierInclinaison()` : Vérifie automatiquement si la voiture est renversée et arrête les moteurs avec rcCar_stop() si nécessaire.
-
+      -`void verifierInclinaison()` : Vérifie automatiquement si la voiture est renversée et arrête les moteurs avec rcCar_stop() si nécessaire.
 - **Privé :**
+
   - Aucune méthode.
 
-
 ## Jérémy : Accéléromètre
+
 * class Accéléromètre : Information {
 
 ## Attributs
+
 Private:
-* std::list<float> Donnée_Brute = [1.0, 2.0, 3.0]
+
+* std::list<float></float> Donnée_Brute = [1.0, 2.0, 3.0]
 * float Threshold = 50.0
 * struct {
   float Accel_X;
   float Accel_Y;
   float Accel_Z;
-} Acceleration_data;
-  
+  } Acceleration_data;
+
 ## Méthodes
+
 Private:
+
 ```
 void Accel_init() {
   démarrage ligne I2C et mise au point des registres au besoin
@@ -186,6 +194,7 @@ void Accel_init() {
     return Value_list;
     }
 ```
+
 ```
   // Modifier pour prendre conpte de la nouvelle structure
   void update_values(Get_values, ) { // Met les attributs à jour
@@ -205,12 +214,15 @@ void Accel_init() {
     print(message de test);
 }
 ```
+
 Public:
+
 ```
   void Set_Threshold(float tilt) {
     this->Threshold = tilt;
     }
 ```
+
 ```
 // utilise la structure dans les attributs
   bool Error_check(float thresh, Acceleration_data) {
@@ -220,25 +232,21 @@ Public:
       return False
   }
 ```
-    
 
 ## Lumière
 
 ### Attributs
 
-* Publique
-
-  * `int Neopixel_brightness; // Utilisé durant l'initialisation`
-  * `int lights_power; // 0 à 100`
-  * `bool lights_on; // Variable déterminant l'état (on ou off) des lumières (phares).`
 * Privé
 
-  * `const int lights_pwm_channel = 0; // utilisé par write2LED`
-  * `Adafruit_NeoPixel pixelsBattery(int NEOPIXEL_BATTERY_NUMBER, int NEOPIXEL_BATTERY_PIN, NEO_GRB + NEO_KHZ800);`
-  * `const int Neopixel_battery_pin;`
-  * `const int Neopixel_battery_number;`
-  * `const int lights_pin;`
+  * `static constexpr int Neopixel_battery_pin; // Utilisé durant l'initialisation`
+  * `static constexpr int Neopixel_battery_number; // Utilisé durant l'initialisation`
+  * `static constexpr int lights_pin; // Utilisé durant l'initialisation`
+  * `Adafruit_NeoPixel pixelsBattery(int NEOPIXEL_BATTERY_NUMBER, int NEOPIXEL_BATTERY_PIN, NEO_GRB + NEO_KHZ800); // Utilisé durant l'initialisation`
+  * `static constexpr int Neopixel_brightness; // Utilisé durant l'initialisation`
   * `bool Se_last = Se; // Variable qui enregistre la valeur de Se (bouton select) au dernier cycle. Utilisé pour détection de front descendant.`
+  * `int lights_power; // intensité (0 à 100)`
+  * `bool lights_on; // Variable déterminant l'état (on ou off) des lumières (phares).`
 
 ### Méthode
 
@@ -251,44 +259,44 @@ Public:
 
   * `static uint8_t percentToPWM(int percent); // est utilisé par write2LED | Convertit 0 à 255 en 0 à 100%`
   * `void toggleLights(); Allume ou ferme les lumières selon l'état de la variable lights_on (si lights_on == false lors de l'appel de cette fonction, les lumières (phares) s'allument et lights_on = true et vice versa)`
-  
+
 ## Robot
 
 __Attributs__
+
 * Publique :
+* Privé :
 
-    * 
-
-* Privé : 
-    * Moteur moteurs;
-    * rccar_lights lumieres;
-    * rccar_batterie batterie;
-    * Accelerometre accelerometre;
-    * bool robotActif;
-    * bool tiltDetecte;
-
+  * Moteur moteurs;
+  * rccar_lights lumieres;
+  * rccar_batterie batterie;
+  * Accelerometre accelerometre;
+  * bool robotActif;
+  * bool tiltDetecte;
 
 __Méthodes__
+
 * Publique :
-    * void initialisation()
-    * void stop()
-    * void update()
+  * void initialisation()
+  * void stop()
+  * void update()
 * Privé :
-    * void gererLumieres()
-    * void gererMoteurs()
-    * void gererAccelerometre()
-    * void gererBatterie()
-
-
+  * void gererLumieres()
+  * void gererMoteurs()
+  * void gererAccelerometre()
+  * void gererBatterie()
 
 ## Message
 
 ### Attributs
+
 **Public**:
+
 * `extern struct_message incomingMessage`
 * `uint8_t peerAddress[]`
-    
+
 **Privé**:
+
 * `longueur_message`
 * `esp_now_peer_info_t peerInfo = {};`
 * `memcpy(peerInfo.peer_addr, peerAddress, 6);`
@@ -297,13 +305,14 @@ __Méthodes__
 * `peerInfo.ifidx = WIFI_IF_STA;`
 
 ### Méthodes
+
 **Public**:
+
 * `esp_now_register_recv_cb(onDataRecv);`
 
 **Privé**:
+
 * `void initialization_esp()`
 * `void initialization_serial_communication()`
 * `void maintenance_communication()`
 * `void peer_communication()`
-
-
