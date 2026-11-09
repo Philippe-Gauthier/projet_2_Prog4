@@ -56,21 +56,21 @@ class Accelerometre : public Information{
         bool Error_check() {
 
             //update_values();
-
+            Serial.print("Fonction error_check OK");
             if (
                 abs(Acceleration_data.Accel_X) > Threshold ||
                 abs(Acceleration_data.Accel_Y) > Threshold ||
                 abs(Acceleration_data.Accel_Z) > Threshold
             ) {
                 accelerometre.state = true;
+                return true;
             }
             else {
                 accelerometre.state = false;
+                return false;
             }
 
             envoie();
-
-            return true;
         }
     };
 

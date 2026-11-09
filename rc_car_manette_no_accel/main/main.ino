@@ -39,6 +39,7 @@ void setup() {
 }
 
 void loop() {
+  robot.update();
   Serial.print("Hello world");
   delay(3000);
 }
